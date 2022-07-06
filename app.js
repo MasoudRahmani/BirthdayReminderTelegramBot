@@ -18,7 +18,7 @@ let counter = 0
 const rule = new schedule.RecurrenceRule();
 rule.hour = 8; //new schedule.Range(0,23,2); //every 2hour
 rule.minute = 30;
-//rule.tz = 'IR';
+rule.tz = 'Asia/Tehran';
 console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
 
 let runner = schedule.scheduleJob(rule, () => {
