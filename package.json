@@ -1,0 +1,30 @@
+{
+  "name": "awhappybirthday",
+  "version": "1.0.0",
+  "description": "remind birthdays of user in a group",
+  "main": "app.js",
+  "dependencies": {
+    "google-spreadsheet": "^3.3.0",
+    "node-telegram-bot-api": "^0.58.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MasoudRahmani/BirthdayReminderTelegramBot.git"
+  },
+  "keywords": [
+    "telegram",
+    "node"
+  ],
+  "author": "Masoud rahmani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MasoudRahmani/BirthdayReminderTelegramBot/issues"
+  },
+  "homepage": "https://github.com/MasoudRahmani/BirthdayReminderTelegramBot#readme"
+}
