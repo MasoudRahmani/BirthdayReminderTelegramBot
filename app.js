@@ -1,5 +1,10 @@
 const { HappyBot } = require('./bot');
+const http = require('http');
 
+/* Heroku something*/
+const server = http.createServer((rq, rs) => { rs.writeHead(200); rs.end('I am running dude.'); });
+server.listen(process.env.PORT || 5000);
+/**/
 const token = process.env.token;
 const userXcelSrc = process.env.document
 const AWgroup = process.env.groupId
