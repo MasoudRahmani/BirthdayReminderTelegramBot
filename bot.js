@@ -49,7 +49,7 @@ class HappyBot {
             client_email: mail,
             private_key: key
         });
-        await doc.loadInfo();
+        //await doc.loadInfo();
         return doc;
     }
     /**
@@ -57,6 +57,7 @@ class HappyBot {
      * @returns false if nothing happend, true if something happend
      */
     async SendHBD() {
+        await this.#gDocument.loadInfo();
         let photo = await this.#getBirthDayPhoto();
         let was_sent = await this.#wasTodaySent();
         if (was_sent) return false;

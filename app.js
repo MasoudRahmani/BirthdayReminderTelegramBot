@@ -14,19 +14,19 @@ const private_key = process.env.key.replace(/\\n/g, "\n")
 let counter = 0
 
 
-try{
-const rule = new schedule.RecurrenceRule();
-rule.hour = 11; //new schedule.Range(0,23,2); //every 2hour
-rule.minute = 30;
+try {
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 11; //new schedule.Range(0,23,2); //every 2hour
+    rule.minute = 30;
 
-console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
+    console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
 
-let bot = new HappyBot(token, AWgroup,userXcelSrc, client_email, private_key)
+    let bot = new HappyBot(token, AWgroup, userXcelSrc, client_email, private_key)
 
-let runner = schedule.scheduleJob(rule, () => {    
-    bot.SendHBD();
-    console.log([++counter, "-", "Run at:", new Date()].join(" "));
-});
-} catch(error){
+    let runner = schedule.scheduleJob(rule, () => {
+        bot.SendHBD();
+        console.log([++counter, "-", "Run at:", new Date()].join(" "));
+    });
+} catch (error) {
     console.log(["Main Entry Err:", error.message.substring(0, 100), "..."].join(" "))
 }
