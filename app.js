@@ -9,7 +9,6 @@ server.listen(process.env.PORT || 5000);
 const token = process.env.token;
 const userXcelSrc = process.env.document
 const AWgroup = process.env.groupId
-const testGr = -1001632481272
 const client_email = process.env.email;
 const private_key = process.env.key.replace(/\\n/g, "\n")
 
