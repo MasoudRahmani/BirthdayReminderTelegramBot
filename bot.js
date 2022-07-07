@@ -24,12 +24,12 @@ class HappyBot {
 
     #botConfig() {
         this.#bot.on('polling_error', (error) => {
-            console.log(["Pulling Err:",error.message.substring(0,100), "..."].join(" ")); // => 'EFATAL'
+            console.log(["Pulling Err:", error.message.substring(0, 100), "..."].join(" ")); // => 'EFATAL'
         });
         this.#bot.on('message', (x) => {
-            this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر');
+            this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر').catch(x => this.handleSentErro(x));
         });
-        
+
     }
 
     #init = async function (sheetSrc, email, key) {
@@ -50,7 +50,7 @@ class HappyBot {
         this.#gDocument = await this.#init(sheetSrc, gEmail, gPrvKey);
         let photo = await this.#getBirthDayPhoto();
         let was_sent = await this.#wasTodaySent();
-        if(was_sent) return;
+        if (was_sent) return;
 
         try {
             this.#getOnlineBirthdays().then(u => {
@@ -61,7 +61,7 @@ class HappyBot {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
                                 let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم ";
                                 let happy = [sir, r.FullName, r.UserName, "\n", "زادروز تولدتان خجسته باد.", "\n", "باتشکر گروه انیم ورلد."].join(" ");
-                                this.#bot.sendPhoto(this.#prvGroup,photo, { caption: happy }).catch(x => this.handleSentErro(x));
+                                this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
                                 celbrated = celbrated + r.UserName + " - "
                             }
@@ -71,16 +71,16 @@ class HappyBot {
                 this.#LogSentCelebration(celbrated);
             })
         } catch (error) {
-            this.#LogError(["Overall sent Err:",error.message.substring(0,100), "..."].join(" "))
+            this.#LogError(["Overall sent Err:", error.message.substring(0, 100), "..."].join(" "))
         }
     }
-    async #wasTodaySent(){
+    async #wasTodaySent() {
         let today = MiladiToShamdiConvertor(new Date());
         let sent = false;
         let sheet = this.#gDocument.sheetsById[946533461];
         let rows = await sheet.getRows();
-        rows.forEach( r =>{
-            if(r.RunDate == today & r.Sent == 'TRUE') {sent = true; return;}
+        rows.forEach(r => {
+            if (r.RunDate == today & r.Sent == 'TRUE') { sent = true; return; }
         })
         return sent;
     }
@@ -115,8 +115,8 @@ class HappyBot {
         const fs = require('fs').promises;
         return await fs.readFile('HBD.jpg');
     }
-    handleSentErro(error){
-        console.log(["Specific Sent Err:",error.message.substring(0,100), "..."].join(" "))
+    handleSentErro(error) {
+        console.log(["Specific Sent Err:", error.message.substring(0, 100), "..."].join(" "))
     }
 }
 module.exports = { HappyBot }
