@@ -20,8 +20,9 @@ rule.minute = 30;
 
 console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
 
-let runner = schedule.scheduleJob(rule, () => {
-    let bot = new HappyBot(token, AWgroup)
+let bot = new HappyBot(token, AWgroup)
+
+let runner = schedule.scheduleJob(rule, () => {    
     bot.run(userXcelSrc, client_email, private_key);
     console.log([++counter, "-", "Run at:", new Date()].join(" "));
 });
