@@ -71,6 +71,7 @@ export class HappyBot {
             this.#getOnlineBirthdays().then(u => {
                 let celbrated = ""
                 u.forEach(r => {
+                    if(util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
@@ -82,12 +83,12 @@ export class HappyBot {
 
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
-                                celbrated = celbrated + r.UserName + " - "
+                                celbrated = `${celbrated} - [U:${r.UserName},N:${r.FullName}]`;
                             }
                         }
                     }
                 })
-                this.#LogSentCelebration(celbrated);
+                this.#LogSentCelebration(celbrated.substring(3));
             })
             return true;
         } catch (error) {
