@@ -1,32 +1,34 @@
-const { HappyBot } = require('./bot');
-const http = require('http');
-const schedule = require('node-schedule');
+'use strict'
+
+import { HappyBot } from './bot';
+import http from 'http';
+import * as schedule from 'node-schedule';
 
 /* Heroku something*/
 const server = http.createServer((rq, rs) => { rs.writeHead(200); rs.end('I am running dude.'); });
 server.listen(process.env.PORT || 5000);
 /**/
-const token = process.env.token;
-const userXcelSrc = process.env.document
-const AWgroup = process.env.groupId
-const client_email = process.env.email;
-const private_key = process.env.key.replace(/\\n/g, "\n")
+const TG_Token = process.env.token;
+const GoogleSheetID = process.env.document
+const TG_GroupId = process.env.groupId
+const GoogleServiceAcc = process.env.email;
+const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 let counter = 0
 
 
 try {
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 11; //new schedule.Range(0,23,2); //every 2hour
-    rule.minute = 30;
+    rule.hour = new schedule.Range(0,23,4); //every 4hour
 
-    console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
+    console.log(`First Run is at: ${rule.nextInvocationDate()}.`);
 
-    let bot = new HappyBot(token, AWgroup, userXcelSrc, client_email, private_key)
+    let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey, TG_GroupId)
 
     let runner = schedule.scheduleJob(rule, () => {
         bot.SendHBD();
-        console.log([++counter, "-", "Run at:", new Date()].join(" "));
+        console.log(`${++counter} - Run at: ${new Date()}.
+        next run at: ${runner.nextInvocationDate()}`);
     });
 } catch (error) {
-    console.log(["Main Entry Err:", error.message.substring(0, 100), "..."].join(" "))
+    console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
 }
