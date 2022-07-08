@@ -27,7 +27,7 @@ try {
     let runner = schedule.scheduleJob(rule, () => {
         bot.SendHBD();
         console.log(`${++counter} - Run at: ${new Date()}.
-        next run at: ${runner.nextInvocationDate()}`);
+        next run at: ${rule.nextInvocationDate()}`);
     });
 } catch (error) {
     console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
