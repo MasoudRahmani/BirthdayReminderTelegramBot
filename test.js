@@ -15,7 +15,13 @@ const client_email = ""
 const private_key = ""
 
 //let Yesterday = util.MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
+const rule = new schedule.RecurrenceRule();
+rule.hour = new schedule.Range(0, 23, 2); //every 4hour
+rule.minute = 0 // needed for every 
+rule.tz = "Asia/Tehran"
 
+ console.log(rule.nextInvocationDate());
+ console.log(rule.nextInvocationDate(rule.nextInvocationDate()));
 //app();
 //just_tg();
 //resolver();
