@@ -71,14 +71,12 @@ export class HappyBot {
             this.#getOnlineBirthdays().then(u => {
                 let celbrated = ""
                 u.forEach(r => {
-                    if(util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
+                    if (util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
                                 let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
-                                let happy = `${sir} ${r.FullName} ${r.UserName}
-                                 زادروز تولدتان خجسته باد.
-                                 باتشکر گروه انیم ورلد.
+                                let happy = `${sir} ${r.FullName} ${r.UserName}\nزادروز تولدتان خجسته باد.\nباتشکر گروه انیم ورلد.
                                  ଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
 
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
