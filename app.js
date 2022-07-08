@@ -1,6 +1,6 @@
 'use strict'
 
-import { HappyBot } from './bot';
+import { HappyBot } from './bot.js'
 import http from 'http';
 import * as schedule from 'node-schedule';
 
@@ -18,7 +18,7 @@ let counter = 0
 
 try {
     const rule = new schedule.RecurrenceRule();
-    rule.hour = new schedule.Range(0,23,4); //every 4hour
+    rule.hour = new schedule.Range(0, 23, 4); //every 4hour
 
     console.log(`First Run is at: ${rule.nextInvocationDate()}.`);
 
