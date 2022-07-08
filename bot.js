@@ -1,14 +1,17 @@
 'use strict';
-const TelegramBot = require('node-telegram-bot-api');
-const { GetShamsiDay, GetShamsiMonth, MiladiToShamdiConvertor } = require('./util');
-const { GoogleSpreadsheet } = require('google-spreadsheet');
 
-class HappyBot {
+import * as util from './my_util.js'
+//import * as GDoc from 'google-spreadsheet';
+import TelegramBot from 'node-telegram-bot-api';
+import * as fs from "fs/promises";
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+
+export class HappyBot {
     #token;
     #prvGroup;
     #bot;
-    #jday = GetShamsiDay(new Date());
-    #jMonth = GetShamsiMonth(new Date());
+    #jday = util.GetShamsiDay();
+    #jMonth = util.GetShamsiMonth();
     #gDocument;
     #SheetSrc;
     #gMail;
@@ -16,40 +19,41 @@ class HappyBot {
     /**
      * 
      * @param {string} authentication token 
-     * @param {Integer} groupId to send happy birthday to 
-     * @param {String} Online Google SpreadSheet Src which has user birthdays on first sheet 
-     * @param {String} Google Service Key Authentication Email
-     * @param {String} Google Service Key Authentication Private Key
+     * @param {string} Online Google SpreadSheet Src which has user birthdays on first sheet 
+     * @param {string} Google Service Key Authentication Email
+     * @param {string} Google Service Key Authentication Private Key
+     * @param {number} ChatID - groupId to send happy birthday to (has default for test)
      */
-    constructor(token, groupToNotify, sheetSrc, gEmail, gPrvKey) {
+    constructor(token, _GSheet, _Gmail, _gKey, chatID = -1001632481272) {
         this.#token = token;
-        this.#prvGroup = groupToNotify;
-        this.#SheetSrc = sheetSrc;
-        this.#gMail = gEmail;
-        this.#gKey = gPrvKey;
+        this.#prvGroup = chatID;
+        this.#SheetSrc = _GSheet;
+        this.#gMail = _Gmail;
+        this.#gKey = _gKey;
         this.#botConfig();
     }
 
     async #botConfig() {
-        this.#bot = new TelegramBot(this.#token, { polling: true });
+        this.#bot = new TelegramBot(this.#token, { polling: true })
 
         this.#bot.on('polling_error', (error) => {
-            console.log(["Pulling Err:", error.message.substring(0, 100), "..."].join(" ")); // => 'EFATAL'
+            console.log(`Pulling Err: ${error.message.substring(0, 100)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (x) => {
             this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر').catch(x => this.handleSentErro(x));
         });
-
-        this.#gDocument = await this.#init(this.#SheetSrc, this.#gMail, this.#gKey);
     }
 
-    #init = async function (src, mail, key) {
-        const doc = new GoogleSpreadsheet(src);
+    async #GetGoogleDoc() {
+        if (this.#gDocument) {
+            return this.#gDocument;
+        }
+        const doc = new GoogleSpreadsheet(this.#SheetSrc);
         await doc.useServiceAccountAuth({
-            client_email: mail,
-            private_key: key
-        });
-        //await doc.loadInfo();
+            client_email: this.#gMail,
+            private_key: this.#gKey
+        }).catch(err => { console.log(err.message.substring(0, 100)) });
+        await doc.loadInfo();
         return doc;
     }
     /**
@@ -57,20 +61,25 @@ class HappyBot {
      * @returns false if nothing happend, true if something happend
      */
     async SendHBD() {
-        await this.#gDocument.loadInfo();
-        let photo = await this.#getBirthDayPhoto();
-        let was_sent = await this.#wasTodaySent();
-        if (was_sent) return false;
-
         try {
+            this.#gDocument = await this.#GetGoogleDoc();
+
+            let photo = await this.#getBirthDayPhoto();
+            let was_sent = await this.#wasTodaySent();
+            if (was_sent) return false;
+
             this.#getOnlineBirthdays().then(u => {
                 let celbrated = ""
                 u.forEach(r => {
                     if (r.Deleted.toLowerCase() == 'false') {
-                        if (r.Day & r.Month) {
+                        if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
-                                let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم ";
-                                let happy = [sir, r.FullName, r.UserName, "\n", "زادروز تولدتان خجسته باد.", "\n", "باتشکر گروه انیم ورلد."].join(" ");
+                                let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
+                                let happy = `${sir} ${r.FullName} ${r.UserName}
+                                 زادروز تولدتان خجسته باد.
+                                 باتشکر گروه انیم ورلد.
+                                 ଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
                                 celbrated = celbrated + r.UserName + " - "
@@ -82,13 +91,13 @@ class HappyBot {
             })
             return true;
         } catch (error) {
-            this.#LogError(["Overall sent Err:", error.message.substring(0, 100), "..."].join(" "))
+            this.#LogError(`Overall sent Err: ${error.message.substring(0, 100)}...`);
             return false;
         }
     }
     async #wasTodaySent() {
-        let today = MiladiToShamdiConvertor(new Date());
-        //let Yesterday = MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
+        let today = util.MiladiToShamdi();
+
         let sent = false;
         let sheet = this.#gDocument.sheetsById[946533461];
         let rows = await sheet.getRows();
@@ -99,11 +108,11 @@ class HappyBot {
     }
     #LogSentCelebration(celbrated) {
         let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: MiladiToShamdiConvertor(new Date()), Sent: (celbrated) ? 'TRUE' : 'FALSE', Sent_To: celbrated });
+        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (celbrated) ? 'TRUE' : 'FALSE', Sent_To: celbrated });
     }
     #LogError(eror) {
         let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: MiladiToShamdiConvertor(new Date()), Sent: 'FALSE', Error: eror });
+        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: 'FALSE', Error: eror });
     }
     #isAGroupMember(userid) {
         let result;
@@ -121,15 +130,15 @@ class HappyBot {
         }
     }
     #getOnlineBirthdays = async function () {
+
         let sheet = this.#gDocument.sheetsById[0];
         return await sheet.getRows();
     }
+
     async #getBirthDayPhoto() {
-        const fs = require('fs').promises;
         return await fs.readFile('HBD.jpg');
     }
     handleSentErro(error) {
-        console.log(["Specific Sent Err:", error.message.substring(0, 100), "..."].join(" "))
+        console.log(`Specific Sent Err: ${error.message.substring(0, 100)} "..."`)
     }
 }
-module.exports = { HappyBot }
