@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "remind birthdays of user in a group",
   "main": "app.js",
+  "type": "module",
   "dependencies": {
     "google-spreadsheet": "^3.3.0",
     "node-schedule": "^2.1.0",
-    "node-telegram-bot-api": "^0.58.0"
+    "node-telegram-bot-api": "^0.58.0",
+    "tg-resolve": "^1.3.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.18"
+    "nodemon": "^2.0.19"
   },
   "scripts": {
     "test": "node test.js",
