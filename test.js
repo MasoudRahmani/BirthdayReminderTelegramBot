@@ -16,6 +16,7 @@ const GoogleKey = ""
 
 
 //let Yesterday = util.MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
+console.log(`🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`);
 
 //app();
 //just_tg();

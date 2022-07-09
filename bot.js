@@ -41,7 +41,7 @@ export class HappyBot {
         });
         this.#bot.on('message', (x) => {
             if (x.chat.type == "private") { //Only answer to private messages
-                this.#bot.sendMessage(x.from.id, `(¬‿¬) بات تبریک تولد  (•◡•) /`).catch(x => this.handleSentErro(x));
+                this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
                 //if from owner
                 if (x.from.ChatID = "90886656") { //Masoud_Rah
                     if (x.text == 'Send') {
