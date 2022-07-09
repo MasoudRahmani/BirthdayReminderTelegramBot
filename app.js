@@ -17,7 +17,7 @@ const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 let counter = 0
 
 try {
-    let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey)
+    let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey, TG_GroupId)
 
     const rule = new schedule.RecurrenceRule();
     rule.hour = new schedule.Range(0, 23, 4); //every 4hour
@@ -28,7 +28,7 @@ try {
         console.log(`${++counter} - Run at: ${new Date()}.
         next run at: ${rule.nextInvocationDate()}`);
 
-        bot.SendHBD();
+       bot.SendHBD();
     });
 } catch (error) {
     console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
