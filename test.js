@@ -8,39 +8,38 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import tgresolve from 'tg-resolve'
 
-const token = ""
-const userXcelSrc = ""
+const TG_Token = ""
+const GoogleSheetID = ""
 //const AWgroup = "-1001224485894"
-const client_email = ""
-const private_key = ""
+const GoogleServiceAcc = ""
+const GoogleKey = ""
+
 
 //let Yesterday = util.MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
-const rule = new schedule.RecurrenceRule();
-rule.hour = new schedule.Range(0, 23, 2); //every 4hour
-rule.minute = 0 // needed for every 
-rule.tz = "Asia/Tehran"
 
- console.log(rule.nextInvocationDate());
- console.log(rule.nextInvocationDate(rule.nextInvocationDate()));
 //app();
 //just_tg();
 //resolver();
 //google();
 function app() {
     let counter = 0
-    const rule = new schedule.RecurrenceRule();
-    rule.minute = new schedule.Range(0, 59, 1); //every 10 sec
+    try {
+        let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey)
 
-    console.log(["First Run is at:", rule.nextInvocationDate()].join(" "));
+        const rule = new schedule.RecurrenceRule();
+        rule.hour = new schedule.Range(0, 23, 4); //every 4hour
+        rule.minute = 0 // needed for every 
+        rule.tz = "Asia/Tehran"
 
-    let bot = new HappyBot(token, userXcelSrc, client_email, private_key)
+        //let runner = schedule.scheduleJob(rule, () => {
+        console.log(`${++counter} - Run at: ${new Date()}.
+            next run at: ${rule.nextInvocationDate()}`);
 
-
-    let runner = schedule.scheduleJob(rule, () => {
-    bot.SendHBD();
-    console.log(`${++counter} - Run at: ${new Date()}.
-      next run at: ${rule.nextInvocationDate()}`);
-    });
+        bot.SendHBD();
+        //        });
+    } catch (error) {
+        console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
+    }
 
 }
 
