@@ -40,18 +40,16 @@ export class HappyBot {
             console.log(`Pulling Err: ${error.message.substring(0, 100)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (x) => {
-            //if from owner
-            if (x.from.ChatID = "90886656") { //Masoud_Rah
-                if (x.text == 'Send') {
-                    this.SendHBD().then(result => {
-                        this.#bot.sendMessage(x.from.id, `result: ${result}`);
+            if (x.chat.type == "private") { //Only answer to private messages
+                this.#bot.sendMessage(x.from.id, `(¬‿¬) بات تبریک تولد  (•◡•) /`).catch(x => this.handleSentErro(x));
+                //if from owner
+                if (x.from.ChatID = "90886656") { //Masoud_Rah
+                    if (x.text == 'Send') {
+                        this.SendHBD().then(result => {
+                            this.#bot.sendMessage(x.from.id, `result: ${result}`);
+                        }
+                        ).catch(x => { this.#bot.sendMessage(x.from.id, err.message) });
                     }
-                    ).catch(x => { this.#bot.sendMessage(x.from.id, err.message) });
-                }
-            }
-            else {
-                if (x.chat.type == "private") { //Only answer to private messages
-                    this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر').catch(x => this.handleSentErro(x));
                 }
             }
         });

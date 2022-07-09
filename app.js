@@ -24,6 +24,8 @@ try {
     rule.minute = 0 // needed for every 
     rule.tz = "Asia/Tehran"
     
+    console.log(`First run is at: ${rule.nextInvocationDate()}`);
+
     let runner = schedule.scheduleJob(rule, () => {
         console.log(`${++counter} - Run at: ${new Date()}.
         next run at: ${rule.nextInvocationDate()}`);
