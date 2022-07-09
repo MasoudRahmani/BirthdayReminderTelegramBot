@@ -40,7 +40,20 @@ export class HappyBot {
             console.log(`Pulling Err: ${error.message.substring(0, 100)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (x) => {
-            this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر').catch(x => this.handleSentErro(x));
+            //if from owner
+            if (x.from.ChatID = "90886656") { //Masoud_Rah
+                if (x.text == 'Send') {
+                    this.SendHBD().then(result => {
+                        this.#bot.sendMessage(x.from.id, `result: ${result}`);
+                    }
+                    ).catch(x => { this.#bot.sendMessage(x.from.id, err.message) });
+                }
+            }
+            else {
+                if (x.chat.type == "private") { //Only answer to private messages
+                    this.#bot.sendMessage(x.from.id, 'این بات پاسخگو به درخواستی نمی‌باشد.\n باتشکر').catch(x => this.handleSentErro(x));
+                }
+            }
         });
     }
 
@@ -76,8 +89,7 @@ export class HappyBot {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
                                 let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
-                                let happy = `${sir} ${r.FullName} ${r.UserName}\nزادروز تولدتان خجسته باد.\nباتشکر گروه انیم ورلد.
-                                 ଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                                let happy = `${sir} ${r.FullName} ${r.UserName}\nزادروز تولدتان خجسته باد.\nباتشکر گروه انیم ورلد.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
 
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
@@ -138,6 +150,6 @@ export class HappyBot {
         return await fs.readFile('HBD.jpg');
     }
     handleSentErro(error) {
-        console.log(`Specific Sent Err: ${error.message.substring(0, 100)} "..."`)
+        console.log(`Specific Sent Err: ${error.message.substring(0, 100)}...`)
     }
 }
