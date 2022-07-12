@@ -23,14 +23,15 @@ try {
     rule.hour = new schedule.Range(0, 23, 4); //every 4hour
     rule.minute = 0 // needed for every 
     rule.tz = "Asia/Tehran"
-    
+
     console.log(`First run is at: ${rule.nextInvocationDate()}`);
 
     let runner = schedule.scheduleJob(rule, () => {
-        console.log(`${++counter} - Run at: ${new Date()}.
+        let date = new Date();
+        console.log(`${++counter} - Run at: ${date}.
         next run at: ${rule.nextInvocationDate()}`);
-
-       bot.SendHBD();
+        if (date.getHours() > 3 & date.getHours < 20)
+            bot.SendHBD();
     });
 } catch (error) {
     console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
