@@ -16,6 +16,9 @@ export class HappyBot {
     #SheetSrc;
     #gMail;
     #gKey;
+    #menTxt ="جناب آقای";
+    #femaleTxt = "سرکار خانم";
+    #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊"
     /**
      * 
      * @param {string} authentication token 
@@ -42,17 +45,27 @@ export class HappyBot {
         this.#bot.on('message', (x) => {
             if (x.chat.type == "private") { //Only answer to private messages
                 this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
-                //if from owner
-                if (x.from.ChatID = "90886656") { //Masoud_Rah
-                    if (x.text == 'Send') {
-                        this.SendHBD().then(result => {
-                            this.#bot.sendMessage(x.from.id, `result: ${result}`);
-                        }
-                        ).catch(x => { this.#bot.sendMessage(x.from.id, err.message) });
-                    }
+
+                if (x.from.ChatID = "90886656") { //if from owner //Masoud_Rah
+                    this.#HandleOwnerRq(x);
                 }
             }
         });
+    }
+    #HandleOwnerRq(req){
+        switch (req.text) {
+            case 'Send':
+                this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                break;
+            case 'SendFake':
+                let photo = await this.#getBirthDayPhoto();
+                let sir = `${this.#menTxt}:\ ${this.#femaleTxt}:`;
+                let happy = `${sir} Masoud @Masoud_rah\n${this.#HBDText}`;
+                this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }).catch(x => this.handleSentErro(x));
+            default:
+                break;
+        }
     }
 
     async #GetGoogleDoc() {
@@ -86,9 +99,9 @@ export class HappyBot {
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
-                                let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
-                                let happy = `${sir} ${r.FullName} ${r.UserName}\nزادروز تولدتان خجسته باد.\nباتشکر گروه انیم ورلد.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
-
+                                let sir = (r.Men == 'TRUE') ? this.#menTxt : this.#femaleTxt;
+                                let happy = `${sir} ${r.FullName} ${r.UserName}\n${this.#HBDText}`;
+                                                                                            
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
                                 celbrated = `${celbrated} - [U:${r.UserName},N:${r.FullName}]`;
