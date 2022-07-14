@@ -47,12 +47,12 @@ export class HappyBot {
                 this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
 
                 if (x.from.ChatID = "90886656") { //if from owner //Masoud_Rah
-                    this.#HandleOwnerRq(x);
+                    await this.#HandleOwnerRq(x);
                 }
             }
         });
     }
-    #HandleOwnerRq(req){
+    async #HandleOwnerRq(req){
         switch (req.text) {
             case 'Send':
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
