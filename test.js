@@ -13,12 +13,10 @@ const GoogleSheetID = ""
 //const AWgroup = "-1001224485894"
 const GoogleServiceAcc = ""
 const GoogleKey = ""
-
-
 //let Yesterday = util.MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
-console.log(`🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`);
+//console.log(`🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`);
 
-//app();
+app();
 //just_tg();
 //resolver();
 //google();
@@ -28,16 +26,24 @@ function app() {
         let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey)
 
         const rule = new schedule.RecurrenceRule();
-        rule.hour = new schedule.Range(0, 23, 4); //every 4hour
-        rule.minute = 0 // needed for every 
-        rule.tz = "Asia/Tehran"
+        // rule.hour = new schedule.Range(0, 23, 2); //every 4hour
+        // rule.minute = 0 // needed for every 
+        // rule.tz = "Asia/Tehran"
+        rule.second = new schedule.Range(0, 59, 4);
 
-        //let runner = schedule.scheduleJob(rule, () => {
-        console.log(`${++counter} - Run at: ${new Date()}.
+        console.log(`First run is at: ${rule.nextInvocationDate()}`);
+        let date = new Date();
+        let runner = schedule.scheduleJob(rule, () => {
+
+            date.setHours(date.getHours() + 1);
+            console.log(`${++counter} - Run at: ${date}.
             next run at: ${rule.nextInvocationDate()}`);
-
-        bot.SendHBD();
-        //        });
+            console.log(date.getHours());
+            if (date.getHours() > 3 & date.getHours() < 20) {
+                //bot.SendHBD();
+                console.log('yes');
+            }
+        });
     } catch (error) {
         console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
     }

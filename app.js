@@ -30,7 +30,7 @@ try {
         let date = new Date();
         console.log(`${++counter} - Run at: ${date}.
         next run at: ${rule.nextInvocationDate()}`);
-        if (date.getHours() > 3 & date.getHours < 20)
+        if (date.getHours() > 3 & date.getHours() < 20)
             bot.SendHBD();
     });
 } catch (error) {

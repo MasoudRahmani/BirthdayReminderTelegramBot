@@ -47,7 +47,7 @@ export class HappyBot {
                 this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
 
                 if (x.from.ChatID = "90886656") { //if from owner //Masoud_Rah
-                    await this.#HandleOwnerRq(x);
+                    this.#HandleOwnerRq(x);
                 }
             }
         });
@@ -61,7 +61,7 @@ export class HappyBot {
             case 'SendFake':
                 let photo = await this.#getBirthDayPhoto();
                 let sir = `${this.#menTxt}:\ ${this.#femaleTxt}:`;
-                let happy = `${sir} Masoud @Masoud_rah\n${this.#HBDText}`;
+                let happy = `${sir}مسعود @Masoud_rah\n${this.#HBDText}`;
                 this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }).catch(x => this.handleSentErro(x));
             default:
                 break;
