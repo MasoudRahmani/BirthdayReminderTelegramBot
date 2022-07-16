@@ -99,8 +99,8 @@ export class HappyBot {
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
-                                let sir = (r.Men == 'TRUE') ? this.#menTxt : this.#femaleTxt;
-                                let happy = `${sir} ${r.FullName} ${r.UserName}\n${this.#HBDText}`;
+                                let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
+                                let happy = `${sir} ${r.FullName} ${r.UserName}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
                                                                                             
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
