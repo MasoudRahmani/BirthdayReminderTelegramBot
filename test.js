@@ -26,11 +26,12 @@ function app() {
     try {
         let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey)
 
-        const rule = new schedule.RecurrenceRule();
-        // rule.hour = new schedule.Range(0, 23, 2); //every 4hour
-        // rule.minute = 0 // needed for every 
-        // rule.tz = "Asia/Tehran"
-        rule.second = new schedule.Range(0, 59, 4);
+       
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 4;//new schedule.Range(0, 23, 4); //every 4hour
+    rule.minute = 2 // needed for every 
+
+
 
         console.log(`First run is at: ${rule.nextInvocationDate()}`);
         let date = new Date();
