@@ -20,8 +20,8 @@ try {
     let bot = new HappyBot(TG_Token, GoogleSheetID, GoogleServiceAcc, GoogleKey, TG_GroupId)
 
     const rule = new schedule.RecurrenceRule();
-    rule.hour = new schedule.Range(0, 23, 4); //every 4hour
-    rule.minute = 0 // needed for every 
+    rule.hour = 3//new schedule.Range(0, 23, 4); //every 4hour
+    rule.minute = 50 // needed for every 
     rule.tz = "Asia/Tehran"
 
     console.log(`First run is at: ${rule.nextInvocationDate()}`);
@@ -30,7 +30,6 @@ try {
         let date = new Date();
         console.log(`${++counter} - Run at: ${date}.
         next run at: ${rule.nextInvocationDate()}`);
-        if (date.getHours() > 3 & date.getHours() < 20)
             bot.SendHBD();
     });
 } catch (error) {

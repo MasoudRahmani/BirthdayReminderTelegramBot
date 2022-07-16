@@ -8,11 +8,12 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 
 import tgresolve from 'tg-resolve'
 
-const TG_Token = ""
-const GoogleSheetID = ""
-//const AWgroup = "-1001224485894"
-const GoogleServiceAcc = ""
-const GoogleKey = ""
+// const TG_Token = ""
+// const GoogleSheetID = ""
+// //const AWgroup = "-1001224485894"
+// const GoogleServiceAcc = ""
+// const GoogleKey = ""
+
 //let Yesterday = util.MiladiToShamdiConvertor(new Date(Date.now() - 86400000))
 //console.log(`🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`);
 
@@ -33,17 +34,17 @@ function app() {
 
         console.log(`First run is at: ${rule.nextInvocationDate()}`);
         let date = new Date();
-        let runner = schedule.scheduleJob(rule, () => {
+       // let runner = schedule.scheduleJob(rule, () => {
 
             date.setHours(date.getHours() + 1);
             console.log(`${++counter} - Run at: ${date}.
             next run at: ${rule.nextInvocationDate()}`);
             console.log(date.getHours());
             if (date.getHours() > 3 & date.getHours() < 20) {
-                //bot.SendHBD();
+                bot.SendHBD();
                 console.log('yes');
             }
-        });
+       // });
     } catch (error) {
         console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
     }
