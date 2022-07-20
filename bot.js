@@ -1,7 +1,6 @@
 'use strict';
 
 import * as util from './my_util.js'
-//import * as GDoc from 'google-spreadsheet';
 import TelegramBot from 'node-telegram-bot-api';
 import * as fs from "fs/promises";
 import { GoogleSpreadsheet } from 'google-spreadsheet';
@@ -16,7 +15,7 @@ export class HappyBot {
     #SheetSrc;
     #gMail;
     #gKey;
-    #menTxt ="جناب آقای";
+    #menTxt = "جناب آقای";
     #femaleTxt = "سرکار خانم";
     #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊"
     /**
@@ -33,10 +32,10 @@ export class HappyBot {
         this.#SheetSrc = _GSheet;
         this.#gMail = _Gmail;
         this.#gKey = _gKey;
-        this.#botConfig();
+        //this.Init();
     }
 
-    async #botConfig() {
+    async Init() {
         this.#bot = new TelegramBot(this.#token, { polling: true })
 
         this.#bot.on('polling_error', (error) => {
@@ -46,23 +45,26 @@ export class HappyBot {
             if (x.chat.type == "private") { //Only answer to private messages
                 this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
 
-                if (x.from.ChatID = "90886656") { //if from owner //Masoud_Rah
+                if (x.from.ChatID == "90886656") { //if from owner //Masoud_Rah
                     this.#HandleOwnerRq(x);
                 }
             }
         });
     }
-    async #HandleOwnerRq(req){
+    async #HandleOwnerRq(req) {
         switch (req.text) {
             case 'Send':
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
             case 'SendFake':
-                let photo = await this.#getBirthDayPhoto();
-                let sir = `${this.#menTxt}:\ ${this.#femaleTxt}:`;
-                let happy = `${sir}مسعود @Masoud_rah\n${this.#HBDText}`;
-                this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }).catch(x => this.handleSentErro(x));
+                {
+                    let photo = await this.#getBirthDayPhoto();
+                    let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
+                    let happy = `${sir}مسعود @Masoud_rah\n${this.#HBDText}`;
+                    this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }).catch(x => this.handleSentErro(x));
+                    break;
+                }
             default:
                 break;
         }
@@ -101,7 +103,7 @@ export class HappyBot {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
                                 let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
                                 let happy = `${sir} ${r.FullName} ${r.UserName}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
-                                                                                            
+
                                 this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
 
                                 celbrated = `${celbrated} - [U:${r.UserName},N:${r.FullName}]`;
@@ -123,9 +125,11 @@ export class HappyBot {
         let sent = false;
         let sheet = this.#gDocument.sheetsById[946533461];
         let rows = await sheet.getRows();
-        rows.forEach(r => {
-            if (r.RunDate == today & !r.Error) { sent = true; return; }
-        })
+
+        // let lr = rows[rows.length-1];
+        // if (lr.RunDate == today & util.isEmpty(lr.Error)) { sent = true; return; }
+
+        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } })
         return sent;
     }
     #LogSentCelebration(celbrated) {
@@ -156,7 +160,6 @@ export class HappyBot {
         let sheet = this.#gDocument.sheetsById[0];
         return await sheet.getRows();
     }
-
     async #getBirthDayPhoto() {
         return await fs.readFile('HBD.jpg');
     }
