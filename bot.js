@@ -45,7 +45,7 @@ export class HappyBot {
             if (x.chat.type == "private") { //Only answer to private messages
                 this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
 
-                if (x.from.ChatID == "90886656") { //if from owner //Masoud_Rah
+                if (x.from.id == "90886656") { //if from owner //Masoud_Rah
                     this.#HandleOwnerRq(x);
                 }
             }
