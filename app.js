@@ -7,7 +7,7 @@ import * as schedule from 'node-schedule';
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
-const TG_GroupId = process.env.groupId
+const TG_GroupId = "-1001224485894";//process.env.groupId
 const GoogleServiceAcc = process.env.email;
 const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 
@@ -34,6 +34,7 @@ async function Main() {
             let date = new Date();
             console.log(`${++counter} - Run at: ${date}.
         next run at: ${rule.nextInvocationDate()}`);
+
             bot.SendHBD();
         });
         console.log(`0 - First run at: ${runner.nextInvocation()}`);

@@ -129,7 +129,7 @@ export class HappyBot {
         // let lr = rows[rows.length-1];
         // if (lr.RunDate == today & util.isEmpty(lr.Error)) { sent = true; return; }
 
-        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } })
+        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> repet log need counter and write once
         return sent;
     }
     #LogSentCelebration(celbrated) {
