@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
 'use strict'
 
+process.env["NTBA_FIX_350"] = 1; //https://github.com/yagop/node-telegram-bot-api/issues/482
+process.env["NTBA_FIX_319"] = 1; //
+
 import { HappyBot } from './bot.js'
 import http from 'http';
 import * as schedule from 'node-schedule';
@@ -27,15 +30,16 @@ async function Main() {
         await bot.Init();
 
         const rule = new schedule.RecurrenceRule();
-        rule.hour = new schedule.Range(0, 23, 1); //every 1hour
+        rule.hour = new schedule.Range(0, 23, 2); //every 1hour
         rule.minute = 0 // needed for every 
 
         let runner = schedule.scheduleJob(rule, () => {
             let date = new Date();
-            console.log(`${++counter} - Run at: ${date}.
-        next run at: ${rule.nextInvocationDate()}`);
+            if (date.getHours() < 22 & date.getHours() > 4) {
+                console.log(`${++counter} - Run at: ${date}.\n\t next run at: ${rule.nextInvocationDate()}`);
 
-            bot.SendHBD();
+                bot.SendHBD();
+            }
         });
         console.log(`0 - First run at: ${runner.nextInvocation()}`);
 
