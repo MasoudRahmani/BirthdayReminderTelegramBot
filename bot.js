@@ -100,11 +100,17 @@ export class HappyBot {
     }
     /**
      * Get AW Birthdays and Sent Happy Birthday to users which have aged today.
-     * @returns false if nothing happend, true if something happend
+     * @returns celebrated users or empty
      */
     async SendHBD() {
-        await this.#Send_HBD(this.#prvGroup, true);
+        return await this.#Send_HBD(this.#prvGroup, true);
     }
+    /**
+     * 
+     * @param {*} customgrp Telegram Private Group to sent happy bd to!
+     * @param {Boolean} check_if_was_sent True to check if we send happy bd today or no, if was sent we dont send anymore, False we send whether was sent or not
+     * @returns result of sending which is celebrated user or "". on exception err msg is returned.
+     */
     async #Send_HBD(customgrp, check_if_was_sent) {
         try {
             if (util.isEmpty(customgrp)) customgrp = this.#prvGroup;
@@ -112,39 +118,41 @@ export class HappyBot {
 
             this.#gDocument = await this.#GetGoogleDoc();
 
-            let photo = await this.#getBirthDayPhoto();
-
             if (check_if_was_sent) {
                 let was_sent = await this.#wasTodaySent();
                 if (was_sent) return false;
             }
-
-            this.#getOnlineBirthdays().then(u => {
-                let celbrated = ""
+            
+            let photo = await this.#getBirthDayPhoto();
+            let celebrated = "";
+            await this.#getOnlineBirthdays().then(async u => {
+                let to_celebrate = [];
+                let happybd = "";
                 u.forEach(r => {
                     let sir = "";
-                    let happy = "";
                     if (util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
                                 sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
-                                happy = `${sir} ${r.FullName} ${r.UserName}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                                sir = `${sir} ${r.FullName} ${r.UserName}`;
 
-                                this.#bot.sendPhoto(customgrp, photo, { caption: happy }, this.fileOptions).catch(x => this.handleSentErro(x));
-
-                                celbrated = `${celbrated} - [U:${r.UserName},N:${r.FullName}]`;
+                                to_celebrate.push(sir);
+                                celebrated = `${celebrated} - [U:${r.UserName},N:${r.FullName}]`;
                             }
                         }
                     }
-                })
-                if (check_if_was_sent)
-                    this.#LogSentCelebration(celbrated.substring(3));
-            })
-            return true;
+                });
+                happybd = `${to_celebrate.join("\n")}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                
+                await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
+                ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
+                ).catch(x => { this.handleSentErro(x); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+            });
+            return celebrated;
         } catch (error) {
             this.#LogError(`Overall sent Err: ${error.message.substring(0, 100)}...`);
-            return false;
+            return error.message.substring(0,100) + "...";
         }
     }
     async #wasTodaySent() {
