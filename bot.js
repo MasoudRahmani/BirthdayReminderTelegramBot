@@ -17,7 +17,13 @@ export class HappyBot {
     #gKey;
     #menTxt = "جناب آقای";
     #femaleTxt = "سرکار خانم";
-    #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊"
+    #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊";
+    fileOptions = {
+        // Explicitly specify the file name.
+        filename: 'AWHappyBdPhoto',
+        // Explicitly specify the MIME type.
+        contentType: 'image/jpeg',
+    };
     /**
      * 
      * @param {string} authentication token 
@@ -62,9 +68,19 @@ export class HappyBot {
                     let photo = await this.#getBirthDayPhoto();
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                     let happy = `${sir}مسعود @Masoud_rah\n${this.#HBDText}`;
-                    this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }).catch(x => this.handleSentErro(x));
+                    this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }, this.fileOptions).catch(x => this.handleSentErro(x));
                     break;
                 }
+            case 'SendTest False': {
+                this.#Send_HBD('-1001632481272', false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                break;
+            }
+            case 'SendTest True': {
+                this.#Send_HBD('-1001632481272', true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                break;
+            }
             default:
                 break;
         }
@@ -87,31 +103,43 @@ export class HappyBot {
      * @returns false if nothing happend, true if something happend
      */
     async SendHBD() {
+        await this.#Send_HBD(this.#prvGroup, true);
+    }
+    async #Send_HBD(customgrp, check_if_was_sent) {
         try {
+            if (util.isEmpty(customgrp)) customgrp = this.#prvGroup;
+            if (util.isEmpty(check_if_was_sent)) this.handleSentErro('check_if_was_sent is empty');
+
             this.#gDocument = await this.#GetGoogleDoc();
 
             let photo = await this.#getBirthDayPhoto();
-            let was_sent = await this.#wasTodaySent();
-            if (was_sent) return false;
+
+            if (check_if_was_sent) {
+                let was_sent = await this.#wasTodaySent();
+                if (was_sent) return false;
+            }
 
             this.#getOnlineBirthdays().then(u => {
                 let celbrated = ""
                 u.forEach(r => {
+                    let sir = "";
+                    let happy = "";
                     if (util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
-                                let sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
-                                let happy = `${sir} ${r.FullName} ${r.UserName}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                                sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
+                                happy = `${sir} ${r.FullName} ${r.UserName}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
 
-                                this.#bot.sendPhoto(this.#prvGroup, photo, { caption: happy }).catch(x => this.handleSentErro(x));
+                                this.#bot.sendPhoto(customgrp, photo, { caption: happy }, this.fileOptions).catch(x => this.handleSentErro(x));
 
                                 celbrated = `${celbrated} - [U:${r.UserName},N:${r.FullName}]`;
                             }
                         }
                     }
                 })
-                this.#LogSentCelebration(celbrated.substring(3));
+                if (check_if_was_sent)
+                    this.#LogSentCelebration(celbrated.substring(3));
             })
             return true;
         } catch (error) {
@@ -125,9 +153,6 @@ export class HappyBot {
         let sent = false;
         let sheet = this.#gDocument.sheetsById[946533461];
         let rows = await sheet.getRows();
-
-        // let lr = rows[rows.length-1];
-        // if (lr.RunDate == today & util.isEmpty(lr.Error)) { sent = true; return; }
 
         rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> repet log need counter and write once
         return sent;
