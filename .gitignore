@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 hidden_config.txt
+fly.toml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -362,3 +363,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+test.js
