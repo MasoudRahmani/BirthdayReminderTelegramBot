@@ -35,7 +35,7 @@ async function Main() {
 
         let runner = schedule.scheduleJob(rule, () => {
             let date = new Date();
-            if (date.getHours() < 22 & date.getHours() > 4) {
+            if (date.getHours() < 18 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
                 console.log(`${++counter} - Run at: ${date}.\n\t next run at: ${rule.nextInvocationDate()}`);
 
                 bot.SendHBD();

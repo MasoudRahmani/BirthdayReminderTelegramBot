@@ -120,7 +120,7 @@ export class HappyBot {
 
             if (check_if_was_sent) {
                 let was_sent = await this.#wasTodaySent();
-                if (was_sent) return false;
+                if (was_sent) return "was sent";
             }
             
             let photo = await this.#getBirthDayPhoto();
