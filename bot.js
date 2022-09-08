@@ -55,26 +55,30 @@ export class HappyBot {
         });
     }
     async #HandleOwnerRq(req) {
-        switch (req.text) {
-            case 'Send':
+        let TestGrp = "-1001632481272";
+
+        switch (req.text.toLowerCase()) {
+            case 'send':
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
-            case 'SendFake':
+            case 'send fake':
                 {
                     let photo = await this.#getBirthDayPhoto();
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                     let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
-                    this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }, this.fileOptions).catch(x => this.handleSentErro(x));
+                    this.#bot.sendPhoto(TestGrp, photo, { caption: happy }, this.fileOptions
+                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                    ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                     break;
                 }
-            case 'SendTest False': {
-                this.#Send_HBD('-1001632481272', false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+            case 'sendtest false': {
+                this.#Send_HBD(TestGrp, false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
             }
-            case 'SendTest True': {
-                this.#Send_HBD('-1001632481272', true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+            case 'sendtest true': {
+                this.#Send_HBD(TestGrp, true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
             }
@@ -143,12 +147,14 @@ export class HappyBot {
                         }
                     }
                 });
-                // happybd = `${to_celebrate.join("\n")}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
-                happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
-                
-                await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
-                ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
-                ).catch(x => { this.handleSentErro(x); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+                if (util.isEmpty(celebrated) == false) {
+                    // happybd = `${to_celebrate.join("\n")}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                    happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
+
+                    await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
+                    ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
+                    ).catch(x => { this.handleSentErro(x); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+                }
             });
             return celebrated;
         } catch (error) {
