@@ -7,10 +7,10 @@
   "dependencies": {
     "google-spreadsheet": "^3.3.0",
     "node-schedule": "^2.1.0",
-    "node-telegram-bot-api": "^0.58.0"
+    "node-telegram-bot-api": "^0.59.0"
   },
   "devDependencies": {
-    "eslint": "^8.20.0",
+    "eslint": "^8.23.0",
     "nodemon": "^2.0.19"
   },
   "scripts": {
@@ -18,7 +18,7 @@
     "start": "node app.js"
   },
   "engines": {
-    "node": "14.x"
+    "node": ">=16.x"
   },
   "repository": {
     "type": "git",
