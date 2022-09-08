@@ -32,16 +32,18 @@ async function Main() {
         const rule = new schedule.RecurrenceRule();
         rule.hour = new schedule.Range(0, 23, 2); //every 1hour
         rule.minute = 0 // needed for every 
-
+        
+        let ran = false;
         let runner = schedule.scheduleJob(rule, () => {
             let date = new Date();
-            if (date.getHours() < 18 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
-                console.log(`${++counter} - Run at: ${date}.\n\t next run at: ${rule.nextInvocationDate()}`);
-
+            ran = false;
+            if (date.getHours() < 19 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
                 bot.SendHBD();
+                ran = true;
             }
+            console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
         });
-        console.log(`0 - First run at: ${runner.nextInvocation()}`);
+        console.log(`0 - First Run at: ${runner.nextInvocation()}`);
 
     } catch (error) {
         console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
