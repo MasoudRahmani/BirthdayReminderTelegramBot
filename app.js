@@ -30,7 +30,7 @@ async function Main() {
         await bot.Init();
 
         const rule = new schedule.RecurrenceRule();
-        rule.hour = new schedule.Range(0, 23, 2); //every 1hour
+        rule.hour = new schedule.Range(0, 23, 2); //every x hour
         rule.minute = 0 // needed for every 
         
         let ran = false;

@@ -8,13 +8,11 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 export class HappyBot {
     #token;
     #prvGroup;
-    #bot;
-    #jday = util.GetShamsiDay();
-    #jMonth = util.GetShamsiMonth();
-    #gDocument;
     #SheetSrc;
     #gMail;
     #gKey;
+    #bot;
+    #gDocument;
     #menTxt = "جناب آقای";
     #femaleTxt = "سرکار خانم";
     #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊";
@@ -38,7 +36,6 @@ export class HappyBot {
         this.#SheetSrc = _GSheet;
         this.#gMail = _Gmail;
         this.#gKey = _gKey;
-        //this.Init();
     }
 
     async Init() {
@@ -67,7 +64,7 @@ export class HappyBot {
                 {
                     let photo = await this.#getBirthDayPhoto();
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
-                    let happy = `${sir}مسعود @Masoud_rah\n${this.#HBDText}`;
+                    let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
                     this.#bot.sendPhoto('-1001632481272', photo, { caption: happy }, this.fileOptions).catch(x => this.handleSentErro(x));
                     break;
                 }
@@ -117,6 +114,8 @@ export class HappyBot {
             if (util.isEmpty(check_if_was_sent)) this.handleSentErro('check_if_was_sent is empty');
 
             this.#gDocument = await this.#GetGoogleDoc();
+            let ir_D = util.GetShamsiDay();
+            let ir_M = util.GetShamsiMonth();
 
             if (check_if_was_sent) {
                 let was_sent = await this.#wasTodaySent();
@@ -133,8 +132,9 @@ export class HappyBot {
                     if (util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
                     if (r.Deleted.toLowerCase() == 'false') {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
-                            if (parseInt(r.Day) == this.#jday & parseInt(r.Month) == this.#jMonth) {
-                                sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
+                            if (parseInt(r.Day) == ir_D & parseInt(r.Month) == ir_M) {
+                                // sir = (r.Men == 'TRUE') ? "جناب آقای" : "سرکار خانم";
+                                sir = (r.Men == 'TRUE') ? this.#menTxt : this.#femaleTxt;
                                 sir = `${sir} ${r.FullName} ${r.UserName}`;
 
                                 to_celebrate.push(sir);
@@ -143,7 +143,8 @@ export class HappyBot {
                         }
                     }
                 });
-                happybd = `${to_celebrate.join("\n")}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                // happybd = `${to_celebrate.join("\n")}\nدر روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊`;
+                happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
                 
                 await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
                 ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
