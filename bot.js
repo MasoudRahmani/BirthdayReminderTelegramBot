@@ -68,7 +68,7 @@ export class HappyBot {
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                     let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
                     this.#bot.sendPhoto(TestGrp, photo, { caption: happy }, this.fileOptions
-                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${JSON.stringify(result)}`); } //make result readable
                     ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                     break;
                 }
@@ -125,7 +125,7 @@ export class HappyBot {
                 let was_sent = await this.#wasTodaySent();
                 if (was_sent) return "was sent";
             }
-            
+
             let photo = await this.#getBirthDayPhoto();
             let celebrated = "";
             await this.#getOnlineBirthdays().then(async u => {
@@ -159,7 +159,7 @@ export class HappyBot {
             return celebrated;
         } catch (error) {
             this.#LogError(`Overall sent Err: ${error.message.substring(0, 100)}...`);
-            return error.message.substring(0,100) + "...";
+            return error.message.substring(0, 100) + "...";
         }
     }
     async #wasTodaySent() {
