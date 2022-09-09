@@ -1,4 +1,7 @@
 'use strict'
+import replaceInFile from "replace-in-file";
+
+
 /**
  * 
  * @param {Date} - Gregorian Date, Default today
@@ -29,4 +32,15 @@ function isEmpty(val) {
     return (val === undefined || val == null || val.length <= 0) ? true : false;
 }
 
-export { MiladiToShamdi, GetShamsiDay, GetShamsiMonth, isEmpty }
+function LogToPublic(txt) {
+    const options = {
+        files: './public_log/index.html',
+        from: /<\/ol>/i, //i is to ignore case sensitivity
+        to: `<li class="list-group-item">${txt}</li>
+            </ol>`
+};
+    replaceInFile(options).then((x) => { console.log(JSON.stringify(x)); }).catch((err) => { console.log(err.message); });
+      
+}
+
+export { MiladiToShamdi, GetShamsiDay, GetShamsiMonth, isEmpty, LogToPublic }
