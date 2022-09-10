@@ -46,7 +46,7 @@ export class HappyBot {
         });
         this.#bot.on('message', (x) => {
             if (x.chat.type == "private") { //Only answer to private messages
-                this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => this.handleSentErro(x));
+                this.#bot.sendMessage(x.from.id, `🌹🌹 🥳 بات تبریک تولد 💃🌹🌹`).catch(x => { util.LogToPublic(x.message.substring(0, 100)) });
 
                 if (x.from.id == "90886656") { //if from owner //Masoud_Rah
                     this.#HandleOwnerRq(x);
@@ -64,7 +64,7 @@ export class HappyBot {
                 break;
             case 'send fake':
                 {
-                    let photo = await this.#getBirthDayPhoto();
+                    let photo = await this.#GetBirthDayPhoto();
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                     let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
                     this.#bot.sendPhoto(TestGrp, photo, { caption: happy }, this.fileOptions
@@ -86,19 +86,6 @@ export class HappyBot {
                 break;
         }
     }
-
-    async #GetGoogleDoc() {
-        if (this.#gDocument) {
-            return this.#gDocument;
-        }
-        const doc = new GoogleSpreadsheet(this.#SheetSrc);
-        await doc.useServiceAccountAuth({
-            client_email: this.#gMail,
-            private_key: this.#gKey
-        }).catch(err => { console.log(err.message.substring(0, 100)) });
-        await doc.loadInfo();
-        return doc;
-    }
     /**
      * Get AW Birthdays and Sent Happy Birthday to users which have aged today.
      * @returns celebrated users or empty
@@ -115,20 +102,20 @@ export class HappyBot {
     async #Send_HBD(customgrp, check_if_was_sent) {
         try {
             if (util.isEmpty(customgrp)) customgrp = this.#prvGroup;
-            if (util.isEmpty(check_if_was_sent)) this.handleSentErro('check_if_was_sent is empty');
+            if (util.isEmpty(check_if_was_sent)) this.LogToPublic('','Send_HBD - check_if_was_sent is empty');
 
             this.#gDocument = await this.#GetGoogleDoc();
             let ir_D = util.GetShamsiDay();
             let ir_M = util.GetShamsiMonth();
 
             if (check_if_was_sent) {
-                let was_sent = await this.#wasTodaySent();
+                let was_sent = await this.#WasTodaySent();
                 if (was_sent) return "was sent";
             }
 
-            let photo = await this.#getBirthDayPhoto();
+            let photo = await this.#GetBirthDayPhoto();
             let celebrated = "";
-            await this.#getOnlineBirthdays().then(async u => {
+            await this.#GetOnlineBirthdays().then(async u => {
                 let to_celebrate = [];
                 let happybd = "";
                 u.forEach(r => {
@@ -152,37 +139,75 @@ export class HappyBot {
                     happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
 
                     await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
-                    ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
-                    ).catch(x => { this.handleSentErro(x); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+                    ).then(x => { if (check_if_was_sent) this.#LogToXL(celebrated.substring(3)); }
+                    ).catch(x => { this.#LogToXL('', x.message); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
                 } else {
-                    this.#LogSentCelebration('');// log today we had no one
+                    this.#LogToXL(celebrated);// log today we had no one
                 }
             });
             return celebrated;
         } catch (error) {
-            this.#LogError(`Overall sent Err: ${error.message.substring(0, 100)}...`);
+            this.#LogToXL('',`Overall sent Err: ${error.message.substring(0, 100)}...`);
             return error.message.substring(0, 100) + "...";
         }
     }
-    async #wasTodaySent() {
+    //----------------- <Google Api functions> -------------------//
+    async #GetGoogleDoc() {
+        if (this.#gDocument) {
+            return this.#gDocument;
+        }
+        const doc = new GoogleSpreadsheet(this.#SheetSrc);
+        await doc.useServiceAccountAuth({
+            client_email: this.#gMail,
+            private_key: this.#gKey
+        }).catch(err => { util.LogToPublic(err.message.substring(0, 100)) });
+        await doc.loadInfo();
+        return doc;
+    }
+    async #GetOnlineBirthdays() {
+
+        let sheet = this.#gDocument.sheetsById[0];
+        return await sheet.getRows();
+    }
+    async #WasTodaySent() {
         let today = util.MiladiToShamdi();
 
         let sent = false;
         let sheet = this.#gDocument.sheetsById[946533461];
         let rows = await sheet.getRows();
 
-        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> repet log need counter and write once
+        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> line 158 (just dont log false - wase of time though)
         return sent;
     }
+    //----------------- </Google Api functions> -------------------//
+
+    //----------------- <Utility functions> -------------------//
+
+    #LogToXL(sendto, err =''){
+        let sheet = this.#gDocument.sheetsById[946533461];
+        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (sendto) ? 'TRUE' : 'FALSE', Sent_To: sendto, Error: err });
+        
+        if (util.isEmpty(sendto)) util.LogToPublic(err);
+    }
+
+    async #GetBirthDayPhoto() {
+        return await fs.readFile('HBD.jpg');
+    }
+    //----------------- </Utility functions> -------------------//
+    /*
     #LogSentCelebration(celbrated) {
         let sheet = this.#gDocument.sheetsById[946533461];
         sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (celbrated) ? 'TRUE' : 'FALSE', Sent_To: celbrated });
     }
-    #LogError(eror) {
+    #LogToXlError(err) {
         let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: 'FALSE', Error: eror });
+        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: 'FALSE', Error: err });
+        
     }
-    #isAGroupMember(userid) {
+    handleSentError(error) {
+     console.log(`Specific Sent Err: ${error.message.substring(0, 100)}...`)
+    }
+    #IsGroupMember(userid) {
         let result;
         let chatmember = this.#bot.getChatMember(this.#prvGroup, userid);
 
@@ -197,15 +222,5 @@ export class HappyBot {
             else return false
         }
     }
-    #getOnlineBirthdays = async function () {
-
-        let sheet = this.#gDocument.sheetsById[0];
-        return await sheet.getRows();
-    }
-    async #getBirthDayPhoto() {
-        return await fs.readFile('HBD.jpg');
-    }
-    handleSentErro(error) {
-        console.log(`Specific Sent Err: ${error.message.substring(0, 100)}...`)
-    }
+    */
 }
