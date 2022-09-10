@@ -1,7 +1,6 @@
 'use strict'
 import replaceInFile from "replace-in-file";
 
-
 /**
  * 
  * @param {Date} - Gregorian Date, Default today
@@ -36,11 +35,11 @@ function LogToPublic(txt) {
     const options = {
         files: './public_log/index.html',
         from: /<\/ol>/i, //i is to ignore case sensitivity
-        to: `<li class="list-group-item">${txt}</li>
+        to: `<li class="list-group-item">${new Date().toLocaleString('fa-IR-u-nu-latn')} - ${txt}</li>
             </ol>`
-};
-    replaceInFile(options).then((x) => { console.log(JSON.stringify(x)); }).catch((err) => { console.log(err.message); });
-      
+    };
+    replaceInFile(options).catch((err) => { console.log(err.message); });
+
 }
 
 export { MiladiToShamdi, GetShamsiDay, GetShamsiMonth, isEmpty, LogToPublic }
