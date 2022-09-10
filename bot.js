@@ -154,6 +154,8 @@ export class HappyBot {
                     await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
                     ).then(x => { if (check_if_was_sent) this.#LogSentCelebration(celebrated.substring(3)); }
                     ).catch(x => { this.handleSentErro(x); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+                } else {
+                    this.#LogSentCelebration('');// log today we had no one
                 }
             });
             return celebrated;
