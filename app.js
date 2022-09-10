@@ -15,7 +15,18 @@ const GoogleServiceAcc = process.env.email;
 const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 
 /* Heroku something*/
-const server = http.createServer((rq, rs) => { rs.writeHead(200); rs.end('I am running dude.'); });
+const server = http.createServer((rq, rs) => {
+    let pathname = `./public_log/index.html`;
+
+    fs.readFile(pathname).then((data) => {
+        rs.writeHead(200, { 'Content-Type': 'text/html' });
+        rs.write(data);
+        return rs.end();
+    }).catch((er) => {
+        rs.writeHead(404, { 'Content-Type': 'text/html' });
+        return rs.end(`${er.code}: 404`);
+    });
+});
 server.listen(process.env.PORT || 5000);
 /**/
 
@@ -32,7 +43,7 @@ async function Main() {
         const rule = new schedule.RecurrenceRule();
         rule.hour = new schedule.Range(0, 23, 2); //every x hour
         rule.minute = 0 // needed for every 
-        
+
         let ran = false;
         let runner = schedule.scheduleJob(rule, () => {
             let date = new Date();
@@ -41,11 +52,14 @@ async function Main() {
                 bot.SendHBD();
                 ran = true;
             }
-            console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
+            //console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
+            util.LogToPublic(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
         });
-        console.log(`0 - First Run at: ${runner.nextInvocation()}`);
+        //console.log(`0 - First Run at: ${runner.nextInvocation()}`);
+        util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
 
     } catch (error) {
-        console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
+        //console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
+        util.LogToPublic(`Main Entry Err: ${error.message.substring(0, 100)}...`);
     }
 }
