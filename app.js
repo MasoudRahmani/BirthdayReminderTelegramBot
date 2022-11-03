@@ -52,14 +52,14 @@ async function Main() {
                 bot.SendHBD();
                 ran = true;
             }
-            //console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
+            console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
             util.LogToPublic(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
         });
-        //console.log(`0 - First Run at: ${runner.nextInvocation()}`);
+        console.log(`0 - First Run at: ${runner.nextInvocation()}`);
         util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
 
     } catch (error) {
-        //console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
+        console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
         util.LogToPublic(`Main Entry Err: ${error.message.substring(0, 100)}...`);
     }
 }
