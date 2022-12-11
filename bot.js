@@ -97,8 +97,8 @@ export class HappyBot {
                     let photo = await this.#GetBirthDayPhoto();
                     let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                     let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
-                    this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy }, this.fileOptions
-                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${JSON.stringify(result)}`); } //make result readable
+                    this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
+                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
                     ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                     break;
                 }
