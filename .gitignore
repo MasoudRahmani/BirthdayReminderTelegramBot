@@ -12,6 +12,8 @@
 hidden_config.txt
 fly.toml
 
+flyctl_privateKey_wireguard_peer.key
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
