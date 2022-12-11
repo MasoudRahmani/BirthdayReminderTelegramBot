@@ -13,7 +13,7 @@ export class HappyBot {
     #bot_server = "https://awhappybd.fly.dev/";
     #randomAnimeApi = "https://api.consumet.org/meta/anilist/random-anime";
     #malUrl = "https://myanimelist.net/anime/";
-    #commands = { send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true', anime: 'anime', cmd: 'commands' };
+    #commands = { send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true', anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public' };
     #TestGroup = "-1001632481272";
     #token;
     #prvGroup;
@@ -88,20 +88,20 @@ export class HappyBot {
     async #HandleOwnerRq(req) {
 
         switch (req.text.toLowerCase()) {
-            case this.#commands.send:
+            case this.#commands.send: {
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
-            case this.#commands.fake:
-                {
-                    let photo = await this.#GetBirthDayPhoto();
-                    let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
-                    let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
-                    this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
-                    ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
-                    ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
-                    break;
-                }
+            }
+            case this.#commands.fake: {
+                let photo = await this.#GetBirthDayPhoto();
+                let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
+                let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
+                this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
+                ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
+                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                break;
+            }
             case this.#commands.test_No_check: {
 
                 this.#Send_HBD(this.#TestGroup, false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
@@ -116,11 +116,12 @@ export class HappyBot {
             case this.#commands.cmd: {
                 this.#bot.sendMessage(req.from.id,
                     `🧑‍💻* فرمان‌ها* با حروف کوچک:\n` +
-                    "1\\. `send` :    اجبار بات به ارسال سریع دوباره\n" +
-                    "2\\. `send fake` :    ارسال یک پیام بی محتوا بدون هیچ بررسی به گروه تست\\. فقط جهت بررسی سلامت عملکرد\n" +
-                    "3\\. `sendtest false` :    تست ارسال، بدون بررسی موارد ارسال شده ی امروز به گروه تست\n" +
-                    "4\\. `sendtest true` :    تست ارسال: با بررسی ارسال شده های امروز\n" +
-                    "5\\. `anime` :    انیمه شانسی😈❤️\n\n\n" +
+                    `1\\. \`${this.#commands.send}\` :    اجبار بات به ارسال سریع دوباره\n` +
+                    `2\\. \`${this.#commands.fake}\` :    ارسال یک پیام بی محتوا بدون هیچ بررسی به گروه تست\\. فقط جهت بررسی سلامت عملکرد\n` +
+                    `3\\. \`${this.#commands.test_No_check}\` :    تست ارسال، بدون بررسی موارد ارسال شده ی امروز به گروه تست\n` +
+                    `4\\. \`${this.#commands.test_check}\` :    تست ارسال: با بررسی ارسال شده های امروز\n` +
+                    `5\\. \`${this.#commands.anime}\` :    انیمه شانسی😈❤️\n` +
+                    `6\\. \`${this.#commands.resetPublicHtml}\` :    ریست کردن لاگ عمومی در آدرس سرور\n\n\n` +
                     `Bot is running at: [Bot Server سرور](${this.#bot_server})`,
                     { parse_mode: 'MarkdownV2' }
                 )
@@ -128,6 +129,11 @@ export class HappyBot {
             }
             case this.#commands.anime: {
                 this.#SendRandomAnime(req.from.id);
+                break;
+            }
+            case this.#commands.resetPublicHtml: {
+                util.ResetPublicLog_HTML();
+                this.#bot.sendMessage(req.from.id, 'request recieved. Check site.');
                 break;
             }
             default:

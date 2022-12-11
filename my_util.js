@@ -1,5 +1,6 @@
 'use strict'
 import replaceInFile from "replace-in-file";
+import { copyFileSync } from 'fs';
 
 /**
  * 
@@ -45,9 +46,14 @@ function GetFileExtension(animeCover) {
     let file_split = animeCover.split('.');
     return (file_split.Length != 1) ? `.${file_split[file_split.length - 1]}` : '';
 }
+function ResetPublicLog_HTML() {
+    let htmlindex = `./public_log/index.html`;
+    let template = `./public_log/index-clean.html`;
+    copyFileSync(template, htmlindex);
+}
 
 export {
     MiladiToShamdi, GetShamsiDay,
     GetShamsiMonth, isEmpty, LogToPublic,
-    GetFileExtension
+    GetFileExtension, ResetPublicLog_HTML
 }
