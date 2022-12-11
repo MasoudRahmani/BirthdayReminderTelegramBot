@@ -8,6 +8,7 @@ import { HappyBot } from './bot.js'
 import http from 'http';
 import * as schedule from 'node-schedule';
 import * as util from './my_util.js'
+import * as fs from "fs/promises";
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
