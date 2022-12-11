@@ -7,6 +7,7 @@ process.env["NTBA_FIX_319"] = 1; //
 import { HappyBot } from './bot.js'
 import http from 'http';
 import * as schedule from 'node-schedule';
+import * as util from './my_util.js'
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
@@ -59,7 +60,7 @@ async function Main() {
         util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
 
     } catch (error) {
-        console.log(`Main Entry Err: ${error.message.substring(0, 100)}...`);
-        util.LogToPublic(`Main Entry Err: ${error.message.substring(0, 100)}...`);
+        console.log(`Main Entry Err: ${(!util.isEmpty(error)) ? error.message.substring(0, 100) : ''}...`);
+        util.LogToPublic(`Main Entry Err: ${(!util.isEmpty(error)) ? error.message.substring(0, 100) : ''}...`);
     }
 }
