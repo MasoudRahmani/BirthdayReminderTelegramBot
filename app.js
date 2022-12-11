@@ -8,7 +8,7 @@ import { HappyBot } from './bot.js'
 import http from 'http';
 import * as schedule from 'node-schedule';
 import * as util from './my_util.js'
-import * as fs from "fs/promises";
+import { readFile } from 'fs/promises';
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
@@ -17,10 +17,9 @@ const GoogleServiceAcc = process.env.email;
 const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 
 /* Heroku something*/
+let htmlindex = `./public_log/index.html`;
 const server = http.createServer((rq, rs) => {
-    let pathname = `./public_log/index.html`;
-
-    fs.readFile(pathname).then((data) => {
+    readFile(htmlindex).then((data) => {
         rs.writeHead(200, { 'Content-Type': 'text/html' });
         rs.write(data);
         return rs.end();
@@ -33,6 +32,8 @@ server.listen(process.env.PORT || 5000);
 /**/
 
 Main();
+
+// رنگی کردن متن ها
 
 async function Main() {
 
