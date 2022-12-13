@@ -3,4 +3,4 @@ export class Person {
         this._FullName = FullName || ''; this._month = Month || ''; this._Day = Day | '';
         this._Year = Year || ''; this._tUserName = UserName || '';
     }
-};
+}
