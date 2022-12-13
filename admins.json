@@ -1,14 +1,1 @@
-{
-    "Admins": [
-        {
-            "Name": "Masoud",
-            "UserName": "@Masoud_rah",
-            "UserId": "90886656"
-        },
-        {
-            "Name": "Hamed",
-            "UserName": "@HamedF",
-            "UserId": "76195398"
-        }
-    ]
-}
+[{"Name":"Masoud","UserName":"@Masoud_rah","UserId":"90886656"},{"Name":"Hamed","UserName":"@HamedF","UserId":"76195398"},{"Name":"پوریا خان","UserName":"@pooria425","UserId":"90600769","AddedByID":90886656,"Date":"Wed Dec 14 2022"}]
