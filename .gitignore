@@ -9,10 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
-hidden_config.txt
 fly.toml
-
-flyctl_privateKey_wireguard_peer.key
+etc/**
+public_log/index.html
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -365,5 +364,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-test.js
-public_log/index.html
