@@ -1,4 +1,6 @@
 'use strict';
+//Todo:
+//write a function to clear txt of reserved character of markdownv2
 
 import * as util from './my_util.js'
 import TelegramBot from 'node-telegram-bot-api';
@@ -10,11 +12,21 @@ import { htmlToText } from 'html-to-text';
 
 //https://core.telegram.org/bots/api#formatting-options
 export class HappyBot {
+    //#region field member
     #bot_server = "https://awhappybd.fly.dev/";
-    #randomAnimeApi = "https://api.consumet.org/meta/anilist/random-anime";
+    #AniListApi = {
+        Random: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
+        Popular: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
+        Trending: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+    };
     #malUrl = "https://myanimelist.net/anime/";
-    #commands = { send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true', anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public' };
+    #commands = {
+        send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true',
+        anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public', add_admin: 'new admin'
+    };
     #TestGroup = "-1001632481272";
+    #adminConfig = 'admins.json';
+    #admins = [];
     #token;
     #prvGroup;
     #SheetSrc;
@@ -31,6 +43,7 @@ export class HappyBot {
         // Explicitly specify the MIME type.
         contentType: 'image/jpeg'
     };
+    //#endregion
     /**
      * 
      * @param {string} authentication token 
@@ -53,6 +66,12 @@ export class HappyBot {
         this.#SheetSrc = _GSheet;
         this.#gMail = _Gmail;
         this.#gKey = _gKey;
+
+        this.#admins = util.GetJson(this.#adminConfig);
+        if (util.isEmpty(this.#admins)) {
+            console.log("Bug: admin not loaded");
+            util.LogToPublic("Bug: admin not loaded");
+        }
     }
 
     async Init() {
@@ -62,32 +81,75 @@ export class HappyBot {
             console.log(`Pulling Err: ${error.message.substring(0, 100)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
-            if (req.chat.type == "private") { //Only answer to private messages
+            if (req.from.is_bot) return;
+            let Admin = this.#admins.find((x) => { return x.UserId == req.from.id });
 
-                if (req.from.id == "90886656" || req.from.id == "76195398") { //if from owner //Masoud_Rah //hamedf
-                    let iscommand = Object.values(this.#commands).includes(req.text.toLowerCase());
-
-                    if (iscommand == false) {
-                        this.#bot.sendMessage(req.from.id,
-                            `🌸 *مدیر* گرامی خوش آمدید\\.\n` +
-                            `    با اجرای دستور \`commands\` میتواند از کامندهای در دسترس مطلع شوید\\.🍀`,
-                            { parse_mode: 'MarkdownV2' }).catch(x => {
-                                console.log(x.message);
-                                util.LogToPublic(x.message)
-                            });
-                    } else
-                        this.#HandleOwnerRq(req);
-                }
-                else {
-                    this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(x => { util.LogToPublic(x.message.substring(0, 100)) });
-                    this.#SendRandomAnime(req.from.id);
-                }
+            switch (req.chat.type) {
+                case "group":
+                case "supergroup":
+                    try {
+                        this.#AllGroups(req, Admin);
+                    }
+                    catch (err) {
+                        console.log(err.message.substring(0, 100) + "...");
+                    }
+                    break;
+                case "private": //Only answer to private messages
+                    this.#PrivateConversation(req, Admin);
+                    break;
+                case "channel":
+                    break;
+                default:
+                    break;
             }
         });
     }
-    async #HandleOwnerRq(req) {
+    #PrivateConversation(req, admin) {
+        let isadmin = util.isEmpty(admin) ? false : true;
 
-        switch (req.text.toLowerCase()) {
+        if (isadmin) {
+            let commandPos = Object.values(this.#commands).findIndex((x) => { return req.text.toLowerCase().startsWith(x); });
+
+            if (commandPos < 0) { // It is not a command
+                this.#bot.sendMessage(req.from.id,
+                    `🌸 *مدیر* گرامی، جناب ${admin.Name} خوش آمدید\\.\n` +
+                    `    با اجرای دستور \`commands\` میتواند از کامندهای در دسترس مطلع شوید\\.🍀`,
+                    { parse_mode: 'MarkdownV2' }).catch(x => {
+                        console.log(x.message);
+                        util.LogToPublic(x.message);
+                    });
+            }
+            else
+                this.#HandleOwnerRq(req);
+        }
+        else {
+            this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(x => { util.LogToPublic(x.message.substring(0, 100)); });
+            this.#AnilistAnimeFun(req.from.id);
+        }
+    }
+    #AllGroups(req, admin) {
+        let isadmin = util.isEmpty(admin) ? false : true;
+        if (isadmin) {
+            if (req.text == "@AWBirthdayBot god") {
+                this.#bot.sendMessage(req.chat.id, " No eye to see, No ear to listen.\n No body to touch to feel warm. \n No hand to comfort.\n\n Yet you seek...");
+            }
+        }
+        if (req.text == "@AWBirthdayBot anime") {
+            this.#AnilistAnimeFun(req.chat.id);
+        }
+    }
+    async #HandleOwnerRq(req) {
+        let request = req.text.toLowerCase();
+        let condition = request;
+
+        //add_admin: Check if pattern is correct and group them to 0:input text , 1: command 2: userid, 3: name 4: telegram username
+        let _possible_admin = request.match(`^(${this.#commands.add_admin}) ([0-9]+)+([^@]*)?(@[^ ]*)?`);
+        condition =
+            (request.startsWith(this.#commands.add_admin))
+                ? this.#commands.add_admin
+                : request;
+
+        switch (condition) {
             case this.#commands.send: {
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
@@ -113,6 +175,8 @@ export class HappyBot {
                 ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
                 break;
             }
+            // In all other places characters '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' 
+            // must be escaped with the preceding character '\'.
             case this.#commands.cmd: {
                 this.#bot.sendMessage(req.from.id,
                     `🧑‍💻* فرمان‌ها* با حروف کوچک:\n` +
@@ -121,25 +185,67 @@ export class HappyBot {
                     `3\\. \`${this.#commands.test_No_check}\` :    تست ارسال، بدون بررسی موارد ارسال شده ی امروز به گروه تست\n` +
                     `4\\. \`${this.#commands.test_check}\` :    تست ارسال: با بررسی ارسال شده های امروز\n` +
                     `5\\. \`${this.#commands.anime}\` :    انیمه شانسی😈❤️\n` +
-                    `6\\. \`${this.#commands.resetPublicHtml}\` :    ریست کردن لاگ عمومی در آدرس سرور\n\n\n` +
+                    `6\\. \`${this.#commands.resetPublicHtml}\` :    ریست کردن لاگ عمومی در آدرس سرور\n` +
+                    `7\\. \`${this.#commands.add_admin}\` :به سرور یک آدمین جدید اضافه کنید\\.\n` +
+                    `    دستور باید همیشه با عدد آیدی کاربر مورد نظر همراه باشد\\. بطور مثال: \n` +
+                    `\`\`\` \n` +
+                    `قالب: \n` +
+                    `${this.#commands.add_admin} {userid} {firstname} {@UserName} \n` +
+                    `نمونه: \n` +
+                    `${this.#commands.add_admin} 90886656 MasoudRahmani @Masoud_rah \n` +
+                    `\`\`\` \n` +
+                    ` \n` +
+                    ` لطفا نهایت دقت لازم را مبذول فرمایید\\.  \n` +
+                    ` \n` +
+                    ` \n\n\n` +
                     `Bot is running at: [Bot Server سرور](${this.#bot_server})`,
                     { parse_mode: 'MarkdownV2' }
                 )
                 break;
             }
             case this.#commands.anime: {
-                this.#SendRandomAnime(req.from.id);
+                this.#AnilistAnimeFun(req.from.id);
                 break;
             }
             case this.#commands.resetPublicHtml: {
-                util.ResetPublicLog_HTML();
-                this.#bot.sendMessage(req.from.id, 'request recieved. Check site.');
+                let result = util.ResetPublicLog_HTML();
+                this.#bot.sendMessage(req.from.id, (result) ? `موفق` : ` ناموفق.`);
                 break;
             }
+            case this.#commands.add_admin: //for when is sent with no argument
+                {
+                    if (util.isEmpty(_possible_admin)) {
+                        this.#bot.sendMessage(req.from.id, "دستور ناقص است، لطفا نحوه وارد کردن پارامتر را مطالعه کنید."); return;
+                    }
+                    let newadmin = { newid: _possible_admin[2], _name: _possible_admin[3].trim(), _user: _possible_admin[4] };
+
+                    if (!util.isEmpty(newadmin.newid)) { //we need id
+
+                        let _exist = this.#admins.findIndex((x) => { return x.UserId == newadmin.newid });
+
+                        if (_exist >= 0) {
+                            this.#bot.sendMessage(req.from.id, "این کاربر قبلا ثبت شده است"); return;
+                        }
+
+                        this.#admins.push({
+                            "Name": newadmin._name,
+                            "UserName": newadmin._user,
+                            "UserId": newadmin.newid,
+                            "AddedByID": req.from.id,
+                            "Date": new Date().toDateString()
+                        })
+                        var result = util.WriteJson(this.#adminConfig, this.#admins);
+                        this.#bot.sendMessage(req.from.id, (result) ? `کاربر با آیدی ${newadmin.newid} با موفقیت اضافه شد.` : `ثبت اطلاعات ناموفق بوده است.`);
+                    } else {
+                        this.#bot.sendMessage(req.from.id, "پارامتر آیدی به درستی وارد نشده است."); return;
+                    }
+                    break;
+                }
             default:
                 break;
         }
     }
+    //#region <Birthday Logic>
     /**
      * Get AW Birthdays and Sent Happy Birthday to users which have aged today.
      * @returns celebrated users or empty
@@ -202,7 +308,9 @@ export class HappyBot {
             return ((!util.isEmpty(error)) ? error.message.substring(0, 100) : '') + "...";
         }
     }
-    //----------------- <Google Api functions> -------------------//
+    //#endregion
+
+    //#region <Google Api functions>
     async #GetGoogleDoc() {
         if (this.#gDocument) {
             return this.#gDocument;
@@ -233,59 +341,77 @@ export class HappyBot {
         rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> line 158 (just dont log false - wase of time though)
         return sent;
     }
-    //----------------- </Google Api functions> -------------------//
+    //#endregion
 
-    //----------------- <Utility functions> -------------------//
+    async #AnilistAnimeFun(userid) {
+        try {
+            let response;
 
-    async #SendRandomAnime(userid) {
-        let response;
-        await fetch(this.#randomAnimeApi).then(x => {
-            response = x;
-        }).catch(x => {
-            console.log(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
-            util.LogToPublic(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
-            return;
-        })
-        let anime = await response.text();
-        anime = JSON.parse(anime);
-        var image = anime.image || anime.cover;
-        if (!image) return;
-        let ext = util.GetFileExtension(image);
-        let mimetype = mime.lookup(ext);
+            /* for now popular and trending has diffrent meta */ // random is buggy
+            // let anilist = Object.values(this.#AniListApi);
+            // let randomApi = anilist[Math.ceil(Math.random() * anilist.length - 1)];
 
-        let desc = htmlToText(anime.description, { preserveNewlines: true });
-
-        let caption =
-            `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
-            `           ${(anime.isAdult == "true") ? '🍑🔞🍑 Adult 🍑🔞🍑' : ''}\n` +
-            `<b>🍕عنوان:</b> <a href="${this.#malUrl.concat(anime.malId)}">${anime.title.romaji}</a>\n` +
-            `<b>🍺نام:</b> ${anime.title.english}\n` +
-            `<b>🍷وضعیت:</b> ${anime.status}\n` +
-            `<b>🍩 نوع پخش:</b> ${anime.type}\n` +
-            `<b>🥂تاریخ شروع:</b> ${anime.releaseDate}\n` +
-            `<b>🍚قسمت‌ها:</b> ${anime.totalEpisodes}\n` +
-            `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(" ,#")) : ''}\n` +
-            `<b>🥗توضیحات:</b>\n${desc}\n`;
-
-        this.#bot.sendPhoto(
-            userid,
-            image,
-            {
-                caption: caption,
-                parse_mode: "HTML"
-            },
-            {
-                // Explicitly specify the file name.
-                filename: `${anime.id}${ext}`,
-                // Explicitly specify the MIME type.
-                contentType: (mimetype != false) ? mimetype : ''
+            await fetch(this.#AniListApi.Random()).then(x => {
+                response = x;
+            }).catch(x => {
+                console.log(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
+                util.LogToPublic(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
+                return;
+            })
+            if (util.isEmpty(response)) {
+                console.log(`Anime Fetch Error`);
+                util.LogToPublic(`Anime Fetch Error`);
+                this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             }
-        ).catch(err => {
-            console.log(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
-            util.LogToPublic(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
-        });
-    }
+            let anime = await response.text();
 
+            console.log(anime.substring(0, 100));
+            anime = JSON.parse(anime);
+
+            var image = anime.image || anime.cover;
+            if (!image) return;
+            let ext = util.GetFileExtension(image);
+            let mimetype = mime.lookup(ext);
+            let genres = anime.genres.map((x) => { return x.trim().replace(" ", "_").replace("-", "_") });
+            let desc = htmlToText(anime.description, { preserveNewlines: true });
+
+            let caption =
+                `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
+                `           ${(anime.isAdult == "true") ? '🍑🔞🍑 Adult 🍑🔞🍑' : ''}\n` +
+                `<b>🍕عنوان:</b> <a href="${this.#malUrl.concat(anime.malId)}">${anime.title.romaji}</a>\n` +
+                `<b>🍺نام:</b> ${anime.title.english}\n` +
+                `<b>🍷وضعیت:</b> ${anime.status}\n` +
+                `<b>🍩 نوع پخش:</b> ${anime.type}\n` +
+                `<b>🥂تاریخ شروع:</b> ${anime.releaseDate}\n` +
+                `<b>🍚قسمت‌ها:</b> ${anime.totalEpisodes}\n` +
+                `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(genres.join(", #")) : ''}\n` +
+                `<b>🥗توضیحات:</b>\n${desc}\n`;
+
+            this.#bot.sendPhoto(
+                userid,
+                image,
+                {
+                    caption: caption,
+                    parse_mode: "HTML"
+                },
+                {
+                    // Explicitly specify the file name.
+                    filename: `${anime.id}${ext}`,
+                    // Explicitly specify the MIME type.
+                    contentType: (mimetype != false) ? mimetype : ''
+                }
+            ).catch(err => {
+                console.log(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
+                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
+            });
+        }
+        catch (err) {
+            console.log(`Anime Error: ${err.message.substring(0.100)}...`);
+            util.LogToPublic(`Anime Error: ${err.message.substring(0, 100)}...`);
+            this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
+        }
+    }
+    //#region <Utility functions>
     #LogToXL(sendto, err = '') {
         let sheet = this.#gDocument.sheetsById[946533461];
         sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (sendto) ? 'TRUE' : 'FALSE', Sent_To: sendto, Error: err });
@@ -295,34 +421,5 @@ export class HappyBot {
     async #GetBirthDayPhoto() {
         return await fs.readFile('HBD.jpg');
     }
-    //----------------- </Utility functions> -------------------//
-    /*
-    #LogSentCelebration(celbrated) {
-        let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (celbrated) ? 'TRUE' : 'FALSE', Sent_To: celbrated });
-    }
-    #LogToXlError(err) {
-        let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: 'FALSE', Error: err });
-        
-    }
-    handleSentError(error) {
-     console.log(`Specific Sent Err: ${error.message.substring(0, 100)}...`)
-    }
-    #IsGroupMember(userid) {
-        let result;
-        let chatmember = this.#bot.getChatMember(this.#prvGroup, userid);
-
-        if (chatmember) {
-            result = chatmember.then((x) => {
-                return x.status
-            })
-            chatmember.catch(x => {
-                console.log(x);
-            })
-            if (result) return true
-            else return false
-        }
-    }
-    */
+    //#endregion
 }
