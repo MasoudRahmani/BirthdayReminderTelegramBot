@@ -47,13 +47,23 @@ function GetFileExtension(animeCover) {
     return (file_split.Length != 1) ? `.${file_split[file_split.length - 1]}` : '';
 }
 function ResetPublicLog_HTML() {
-    let htmlindex = `./public_log/index.html`;
-    let template = `./public_log/index-clean.html`;
-    copyFileSync(template, htmlindex);
+    try {
+        let htmlindex = `./public_log/index.html`;
+        let template = `./public_log/index-clean.html`;
+        copyFileSync(template, htmlindex);
+        return true;
+    } catch (error) {
+        console.log(error.message);
+        LogToPublic(error.message);
+        return false;
+    }
 }
 function GetJson(path) {
-
-    return JSON.parse(readFileSync(path));
+    try {
+        return JSON.parse(readFileSync(path));
+    } catch (err) {
+        return '';
+    }
 }
 function WriteJson(path, Object) {
 
