@@ -1,6 +1,6 @@
 'use strict'
 import replaceInFile from "replace-in-file";
-import { copyFileSync } from 'fs';
+import { copyFileSync, readFileSync, writeFileSync } from 'fs';
 
 /**
  * 
@@ -36,7 +36,7 @@ function LogToPublic(txt) {
     const options = {
         files: './public_log/index.html',
         from: /<\/ol>/i, //i is to ignore case sensitivity
-        to: `<li class="list-group-item">${new Date().toLocaleString('fa-IR-u-nu-latn')} - ${txt}</li>
+        to: `<li class="list-group-item">${new Date().toLocaleString('fa-IR-u-nu-latn')}  --  ${txt}</li>
             </ol>`
     };
     replaceInFile(options).catch((err) => { console.log(err.message); });
@@ -51,9 +51,25 @@ function ResetPublicLog_HTML() {
     let template = `./public_log/index-clean.html`;
     copyFileSync(template, htmlindex);
 }
+function GetJson(path) {
+
+    return JSON.parse(readFileSync(path));
+}
+function WriteJson(path, Object) {
+
+    try {
+        writeFileSync(path, JSON.stringify(Object), { encoding: "utf8", });
+        return true;
+    } catch (error) {
+        LogToPublic("Json Write Failed.");
+        console.log("Json Write Failed.");
+        return false;
+    }
+}
 
 export {
     MiladiToShamdi, GetShamsiDay,
     GetShamsiMonth, isEmpty, LogToPublic,
-    GetFileExtension, ResetPublicLog_HTML
+    GetFileExtension, ResetPublicLog_HTML,
+    GetJson, WriteJson
 }
