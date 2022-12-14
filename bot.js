@@ -347,13 +347,14 @@ export class HappyBot {
     //#endregion
 
     #ProcessAnimeApiResponse(response, api) {
-        let raw = (
+        let raw = JSON.parse(response);
+
+        raw = (
             api == this.#AniListApi.Popular ||
             api == this.#AniListApi.Trending
-        ) ? response.result : response;
+        ) ? raw.results[0] : raw;
 
-        raw = JSON.parse(raw);
-        console.log(raw.substring(0, 20));
+        if (util.isEmpty(raw)) return false;
 
         let image = raw.image || raw.cover
         let ext = util.GetFileExtension(image);
@@ -406,6 +407,7 @@ export class HappyBot {
             let anime_json = await response.text();
 
             let anime = this.#ProcessAnimeApiResponse(anime_json, randomApi);
+            if (anime == false) this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             //            if (!anime_data.image) return;
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
@@ -443,8 +445,8 @@ export class HappyBot {
             });
         }
         catch (err) {
-            console.log(`Anime Error: ${util.ShortError(err, 100)}...`);
-            util.LogToPublic(`Anime Error: ${util.ShortError(err, 100)}...`);
+            console.log(`Anime Error: ${util.ShortError(err, 250)}...`);
+            util.LogToPublic(`Anime Error: ${util.ShortError(err, 250)}...`);
             this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
         }
     }
