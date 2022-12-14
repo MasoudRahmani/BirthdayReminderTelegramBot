@@ -68,7 +68,7 @@ export class HappyBot {
         this.#gKey = _gKey;
 
         this.#admins = util.GetJson(this.#adminConfig);
-        if (util.isEmpty(this.#admins)) {
+        if (this.#admins == false) {
             console.log("Bug: admin not loaded");
             util.LogToPublic("Bug: admin not loaded");
         }
@@ -76,9 +76,9 @@ export class HappyBot {
 
     async Init() {
         this.#bot = new TelegramBot(this.#token, { polling: true })
-        this.#bot.on('polling_error', (error) => {
-            util.LogToPublic(`Pulling Err: ${error.message.substring(0, 100)}...`);
-            console.log(`Pulling Err: ${error.message.substring(0, 100)}...`); // => 'EFATAL'
+        this.#bot.on('polling_error', (err) => {
+            util.LogToPublic(`Pulling Err: ${util.ShortError(err, 200)}...`);
+            console.log(`Pulling Err: ${util.ShortError(err, 200)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
             if (req.from.is_bot) return;
@@ -91,7 +91,7 @@ export class HappyBot {
                         this.#AllGroups(req, Admin);
                     }
                     catch (err) {
-                        console.log(err.message.substring(0, 100) + "...");
+                        console.log(util.ShortError(err, 100));
                     }
                     break;
                 case "private": //Only answer to private messages
@@ -114,16 +114,16 @@ export class HappyBot {
                 this.#bot.sendMessage(req.from.id,
                     `🌸 *مدیر* گرامی، جناب ${admin.Name} خوش آمدید\\.\n` +
                     `    با اجرای دستور \`commands\` میتواند از کامندهای در دسترس مطلع شوید\\.🍀`,
-                    { parse_mode: 'MarkdownV2' }).catch(x => {
-                        console.log(x.message);
-                        util.LogToPublic(x.message);
+                    { parse_mode: 'MarkdownV2' }).catch(err => {
+                        console.log(util.ShortError(err, 200));
+                        util.LogToPublic(util.ShortError(err, 200));
                     });
             }
             else
                 this.#HandleOwnerRq(req);
         }
         else {
-            this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(x => { util.LogToPublic(x.message.substring(0, 100)); });
+            this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(err => { util.LogToPublic(util.ShortError(err, 200)); });
             this.#AnilistAnimeFun(req.from.id);
         }
     }
@@ -152,7 +152,7 @@ export class HappyBot {
         switch (condition) {
             case this.#commands.send: {
                 this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
-                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             case this.#commands.fake: {
@@ -161,18 +161,18 @@ export class HappyBot {
                 let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
                 this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
                 ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
-                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             case this.#commands.test_No_check: {
 
                 this.#Send_HBD(this.#TestGroup, false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
-                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             case this.#commands.test_check: {
                 this.#Send_HBD(this.#TestGroup, true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
-                ).catch(x => { this.#bot.sendMessage(req.from.id, x) });
+                ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             // In all other places characters '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!' 
@@ -297,15 +297,18 @@ export class HappyBot {
 
                     await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
                     ).then((/*x*/) => { if (check_if_was_sent) this.#LogToXL(celebrated.substring(3)); }
-                    ).catch(x => { this.#LogToXL('', x.message); celebrated = x.message.substring(0, 100) });//if err we didnt celebrate then we need to sendback error result;
+                    ).catch(err => {
+                        this.#LogToXL('', err.message);
+                        celebrated = util.ShortError(err, 200)
+                    });//if err we didnt celebrate then we need to sendback error result;
                 } else {
                     //this.#LogToXL(celebrated);// log today we had no one -> too many log. just the fact that there was no error and log says nothing happend.
                 }
             });
             return celebrated;
-        } catch (error) {
-            this.#LogToXL('', `Overall sent Err: ${(!util.isEmpty(error)) ? error.message.substring(0, 100) : ''}...`);
-            return ((!util.isEmpty(error)) ? error.message.substring(0, 100) : '') + "...";
+        } catch (err) {
+            this.#LogToXL('', `Overall sent Err: ${util.ShortError(err, 200)}`);
+            return (util.ShortError(err, 200));
         }
     }
     //#endregion
@@ -320,8 +323,8 @@ export class HappyBot {
             client_email: this.#gMail,
             private_key: this.#gKey
         }).catch(err => {
-            console.log((!util.isEmpty(err.message)) ? err.substring(0, 200) : '');
-            util.LogToPublic((!util.isEmpty(err.message)) ? err.message.substring(0, 100) : '');
+            console.log(util.ShortError(err, 200));
+            util.LogToPublic(util.ShortError(err, 100));
         });
         await doc.loadInfo();
         return doc;
@@ -343,19 +346,56 @@ export class HappyBot {
     }
     //#endregion
 
+    #ProcessAnimeApiResponse(response, api) {
+        let raw = (
+            api == this.#AniListApi.Popular ||
+            api == this.#AniListApi.Trending
+        ) ? response.result : response;
+
+        raw = JSON.parse(raw);
+        console.log(raw.substring(0, 20));
+
+        let image = raw.image || raw.cover
+        let ext = util.GetFileExtension(image);
+        let genres = raw.genres.map((x) => { return x.trim().replace(" ", "_").replace("-", "_") });
+        let desc = htmlToText(raw.description, { preserveNewlines: true });
+        let mimetyp = mime.lookup(ext) || 'image/jpeg';
+
+        let anime_data = {
+            isAdult: raw.isAdult,
+            id: raw.id,
+            image: image,
+            ext: ext,
+            mimetype: mimetyp,
+            mal_link: this.#malUrl.concat(raw.malId),
+            t_romanji: raw.romaji,
+            t_english: raw.english,
+            t_native: raw.native,
+            status: raw.status,
+            type: raw.type,
+            releaseDate: raw.releasedDate,
+            totalEpisodes: raw.totalEpisodes,
+            genres: genres,
+            desc: desc,
+            rating: raw.rating,
+            duration: raw.duration
+        }
+        return anime_data;
+
+    }
+
     async #AnilistAnimeFun(userid) {
         try {
             let response;
 
-            /* for now popular and trending has diffrent meta */ // random is buggy
-            // let anilist = Object.values(this.#AniListApi);
-            // let randomApi = anilist[Math.ceil(Math.random() * anilist.length - 1)];
+            let anilist = Object.values(this.#AniListApi);
+            let randomApi = anilist[Math.ceil(Math.random() * anilist.length - 1)];
 
-            await fetch(this.#AniListApi.Random()).then(x => {
+            await fetch(randomApi()).then(x => {
                 response = x;
-            }).catch(x => {
-                console.log(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
-                util.LogToPublic(`Random Anime Fetch Error: ${(!util.isEmpty(x.message)) ? x.message.substring(0, 200) : ''}`);
+            }).catch(err => {
+                console.log(`Random Anime Fetch Error: ${util.ShortError(err, 200)}`);
+                util.LogToPublic(`Random Anime Fetch Error: ${util.ShortError(err, 200)}`);
                 return;
             })
             if (util.isEmpty(response)) {
@@ -363,51 +403,48 @@ export class HappyBot {
                 util.LogToPublic(`Anime Fetch Error`);
                 this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             }
-            let anime = await response.text();
+            let anime_json = await response.text();
 
-            console.log(anime.substring(0, 100));
-            anime = JSON.parse(anime);
-
-            var image = anime.image || anime.cover;
-            if (!image) return;
-            let ext = util.GetFileExtension(image);
-            let mimetype = mime.lookup(ext);
-            let genres = anime.genres.map((x) => { return x.trim().replace(" ", "_").replace("-", "_") });
-            let desc = htmlToText(anime.description, { preserveNewlines: true });
-
+            let anime = this.#ProcessAnimeApiResponse(anime_json, randomApi);
+            //            if (!anime_data.image) return;
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
                 `           ${(anime.isAdult == "true") ? '🍑🔞🍑 Adult 🍑🔞🍑' : ''}\n` +
-                `<b>🍕عنوان:</b> <a href="${this.#malUrl.concat(anime.malId)}">${anime.title.romaji}</a>\n` +
-                `<b>🍺نام:</b> ${anime.title.english}\n` +
+                `<b>🍕عنوان:</b> <a href="${anime.mal_link}">${anime.t_romanji}</a>\n` +
+                `<b>🍺نام:</b> ${anime.t_english || anime.t_native}\n` +
                 `<b>🍷وضعیت:</b> ${anime.status}\n` +
                 `<b>🍩 نوع پخش:</b> ${anime.type}\n` +
                 `<b>🥂تاریخ شروع:</b> ${anime.releaseDate}\n` +
                 `<b>🍚قسمت‌ها:</b> ${anime.totalEpisodes}\n` +
-                `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(genres.join(", #")) : ''}\n` +
-                `<b>🥗توضیحات:</b>\n${desc}\n`;
+                `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : ''}\n` +
+                `<b>☕️rating: </b> ${anime.rating}\n` +
+                `\n` +
+                `\n` +
+                `<b>🥗توضیحات:</b>\n${anime.desc}\n` +
+                `\n`
+                ;
 
             this.#bot.sendPhoto(
                 userid,
-                image,
+                anime.image,
                 {
                     caption: caption,
                     parse_mode: "HTML"
                 },
                 {
                     // Explicitly specify the file name.
-                    filename: `${anime.id}${ext}`,
+                    filename: `${anime.id}${anime.ext}`,
                     // Explicitly specify the MIME type.
-                    contentType: (mimetype != false) ? mimetype : ''
+                    contentType: anime.mimetype
                 }
             ).catch(err => {
-                console.log(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
-                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${(!util.isEmpty(err.message)) ? err.message.substring(0, 200) : ''}`);
+                console.log(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 200)}`);
+                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 200)}`);
             });
         }
         catch (err) {
-            console.log(`Anime Error: ${err.message.substring(0.100)}...`);
-            util.LogToPublic(`Anime Error: ${err.message.substring(0, 100)}...`);
+            console.log(`Anime Error: ${util.ShortError(err, 100)}...`);
+            util.LogToPublic(`Anime Error: ${util.ShortError(err, 100)}...`);
             this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
         }
     }
