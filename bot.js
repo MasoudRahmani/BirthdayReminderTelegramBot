@@ -370,7 +370,7 @@ export class HappyBot {
 
         let image = raw.image || raw.cover
         let ext = util.GetFileExtension(image);
-        let genres = raw.genres.map((x) => { return x.trim().replace(" ", "_").replace("-", "_") });
+        let genres = raw.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
         let desc = htmlToText(raw.description, { preserveNewlines: true });
         let mimetyp = mime.lookup(ext) || 'image/jpeg';
 
@@ -422,21 +422,21 @@ export class HappyBot {
             if (anime == false) this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             //            if (!anime_data.image) return;
             let caption =
-                `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
-                `           ${(anime.isAdult == "true") ? '🍑🔞🍑 Adult 🍑🔞🍑' : ''}\n` +
-                `<b>🍕عنوان:</b> <a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
-                `<b>🍺نام:</b> ${anime.t_english || anime.t_native}\n` +
-                `<b>🍷وضعیت:</b> ${anime.status}\n` +
-                `<b>🍩 نوع پخش:</b> ${anime.type}\n` +
-                `<b>🥂تاریخ شروع:</b> ${anime.releaseDate}\n` +
-                `<b>🍚قسمت‌ها:</b> ${anime.totalEpisodes}\n` +
-                `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : ''}\n` +
-                `<b>☕️rating: </b> ${anime.rating}\n` +
+                `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس یا اقبال 🎗\n` +
+                `${(anime.isAdult == "true") ? ' 🍑 Adult 🍑 ' : ''}\n` +
+                `<b>🍕عنوان:</b><a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
+                `<b>🍺نام:</b>${anime.t_english || anime.t_native}\n` +
+                `<b>🍷وضعیت:</b>${anime.status}\n` +
+                `<b>🍩 نوع پخش:</b>${anime.type}\n` +
+                `<b>🥂تاریخ شروع:</b>${anime.releaseDate}\n` +
+                `<b>🍚قسمت‌ها:</b>${anime.totalEpisodes}\n` +
+                `<b>☕️ژانر:</b>${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : ''}\n` +
+                `<b>*رتبه: </b>${anime.rating}\n` +
                 `\n` +
-                `<b>🥗توضیحات:</b>\n`;
+                `🥗 `;
             let remaining = this.#telegram_caption_limit - caption.length;
 
-            let caption_p2 = anime.desc.substring(0, remaining - 5);
+            let caption_p2 = anime.desc.substring(0, remaining - 4);
 
             caption = caption.concat(`${caption_p2}...`);
 
