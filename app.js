@@ -6,9 +6,10 @@ process.env["NTBA_FIX_319"] = 1; //
 
 import { HappyBot } from './bot.js'
 import http from 'http';
+import serveStatic from 'serve-static';
+import finalhandler from 'finalhandler';
 import * as schedule from 'node-schedule';
 import * as util from './my_util.js'
-import { readFile } from 'fs/promises';
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
@@ -16,24 +17,19 @@ const TG_GroupId = "-1001224485894";//process.env.groupId
 const GoogleServiceAcc = process.env.email;
 const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 
-/* Heroku something*/
-let htmlindex = `./public_log/index.html`;
+
+let publicPath = `./public_log/`;
+
+var serve = serveStatic(publicPath, { index: ['index.html', 'index.htm'] })
+
 const server = http.createServer((rq, rs) => {
-    readFile(htmlindex).then((data) => {
-        rs.writeHead(200, { 'Content-Type': 'text/html' });
-        rs.write(data);
-        return rs.end();
-    }).catch((er) => {
-        rs.writeHead(404, { 'Content-Type': 'text/html' });
-        return rs.end(`${er.code}: 404`);
-    });
+    serve(rq, rs, finalhandler(rq, rs));
 });
 server.listen(process.env.PORT || 5000);
 /**/
 
 Main();
 
-// رنگی کردن متن ها
 
 async function Main() {
 
@@ -61,8 +57,8 @@ async function Main() {
         console.log(`0 - First Run at: ${runner.nextInvocation()}`);
         util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
 
-    } catch (error) {
-        console.log(`Main Entry Err: ${(!util.isEmpty(error)) ? error.message.substring(0, 100) : ''}...`);
-        util.LogToPublic(`Main Entry Err: ${(!util.isEmpty(error)) ? error.message.substring(0, 100) : ''}...`);
+    } catch (err) {
+        console.log(`Main Entry Err: ${util.ShortError(err, 200)}`);
+        util.LogToPublic(`Main Entry Err: ${util.ShortError(err, 200)}`);
     }
 }
