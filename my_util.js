@@ -62,7 +62,7 @@ function GetJson(path) {
     try {
         return JSON.parse(readFileSync(path));
     } catch (err) {
-        return '';
+        return false;
     }
 }
 function WriteJson(path, Object) {
@@ -76,10 +76,13 @@ function WriteJson(path, Object) {
         return false;
     }
 }
+function ShortError(err, count){
+    return (!isEmpty(err.message)) ? `${err.message.substring(0, count)}...` : '';
+}
 
 export {
     MiladiToShamdi, GetShamsiDay,
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
-    GetJson, WriteJson
+    GetJson, WriteJson, ShortError
 }
