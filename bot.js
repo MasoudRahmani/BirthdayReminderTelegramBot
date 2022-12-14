@@ -28,6 +28,7 @@ export class HappyBot {
     #adminConfig = 'admins.json';
     #admins = [];
     #token;
+    #telegram_caption_limit = 1024;
     #prvGroup;
     #SheetSrc;
     #gMail;
@@ -369,12 +370,12 @@ export class HappyBot {
             ext: ext,
             mimetype: mimetyp,
             mal_link: this.#malUrl.concat(raw.malId),
-            t_romanji: raw.romaji,
-            t_english: raw.english,
-            t_native: raw.native,
+            t_romaji: raw.title.romaji,
+            t_english: raw.title.english,
+            t_native: raw.title.native,
             status: raw.status,
             type: raw.type,
-            releaseDate: raw.releasedDate,
+            releaseDate: raw.releaseDate || raw.releasedDate,
             totalEpisodes: raw.totalEpisodes,
             genres: genres,
             desc: desc,
@@ -412,7 +413,7 @@ export class HappyBot {
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس و یا اقبال 🎗\n` +
                 `           ${(anime.isAdult == "true") ? '🍑🔞🍑 Adult 🍑🔞🍑' : ''}\n` +
-                `<b>🍕عنوان:</b> <a href="${anime.mal_link}">${anime.t_romanji}</a>\n` +
+                `<b>🍕عنوان:</b> <a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
                 `<b>🍺نام:</b> ${anime.t_english || anime.t_native}\n` +
                 `<b>🍷وضعیت:</b> ${anime.status}\n` +
                 `<b>🍩 نوع پخش:</b> ${anime.type}\n` +
@@ -421,10 +422,12 @@ export class HappyBot {
                 `<b>☕️ژانر:</b> ${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : ''}\n` +
                 `<b>☕️rating: </b> ${anime.rating}\n` +
                 `\n` +
-                `\n` +
-                `<b>🥗توضیحات:</b>\n${anime.desc}\n` +
-                `\n`
-                ;
+                `<b>🥗توضیحات:</b>\n`;
+            let remaining = this.#telegram_caption_limit - caption.length;
+
+            let caption_p2 = anime.desc.substring(0, remaining - 5);
+
+            caption = caption.concat(`${caption_p2}...`);
 
             this.#bot.sendPhoto(
                 userid,
@@ -440,8 +443,8 @@ export class HappyBot {
                     contentType: anime.mimetype
                 }
             ).catch(err => {
-                console.log(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 200)}`);
-                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 200)}`);
+                console.log(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 300)}`);
+                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 300)}`);
             });
         }
         catch (err) {
