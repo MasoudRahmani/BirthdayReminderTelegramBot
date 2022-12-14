@@ -1,6 +1,7 @@
 'use strict';
 //Todo:
 //write a function to clear txt of reserved character of markdownv2
+// group slow mode time and send based on that time
 
 import * as util from './my_util.js'
 import TelegramBot from 'node-telegram-bot-api';
@@ -76,13 +77,20 @@ export class HappyBot {
     }
 
     async Init() {
-        this.#bot = new TelegramBot(this.#token, { polling: true })
+        this.#bot = new TelegramBot(this.#token, { polling: true });
+
         this.#bot.on('polling_error', (err) => {
             util.LogToPublic(`Pulling Err: ${util.ShortError(err, 200)}...`);
             console.log(`Pulling Err: ${util.ShortError(err, 200)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
-            if (req.from.is_bot) return;
+            if (
+                req.from.is_bot ||
+                util.isEmpty(req.text) // it is not text - vide, photo or etc
+            ) return;
+
+            req.text = req.text.toLowerCase();
+
             let Admin = this.#admins.find((x) => { return x.UserId == req.from.id });
 
             switch (req.chat.type) {
@@ -92,7 +100,7 @@ export class HappyBot {
                         this.#AllGroups(req, Admin);
                     }
                     catch (err) {
-                        console.log(util.ShortError(err, 100));
+                        console.log(util.ShortError(err, 400));
                     }
                     break;
                 case "private": //Only answer to private messages
@@ -109,7 +117,7 @@ export class HappyBot {
         let isadmin = util.isEmpty(admin) ? false : true;
 
         if (isadmin) {
-            let commandPos = Object.values(this.#commands).findIndex((x) => { return req.text.toLowerCase().startsWith(x); });
+            let commandPos = Object.values(this.#commands).findIndex((x) => { return req.text.startsWith(x); });
 
             if (commandPos < 0) { // It is not a command
                 this.#bot.sendMessage(req.from.id,
@@ -129,18 +137,21 @@ export class HappyBot {
         }
     }
     #AllGroups(req, admin) {
+        // group slow mode time and send based on that time
+        // group comand as field maybe?
+
         let isadmin = util.isEmpty(admin) ? false : true;
         if (isadmin) {
-            if (req.text == "@AWBirthdayBot god") {
+            if (util.Compare_ignoreC(req.text, "@AWBirthdayBot god")) {
                 this.#bot.sendMessage(req.chat.id, " No eye to see, No ear to listen.\n No body to touch to feel warm. \n No hand to comfort.\n\n Yet you seek...");
             }
         }
-        if (req.text == "@AWBirthdayBot anime") {
+        if (util.Compare_ignoreC(req.text, "@AWBirthdayBot anime")) {
             this.#AnilistAnimeFun(req.chat.id);
         }
     }
     async #HandleOwnerRq(req) {
-        let request = req.text.toLowerCase();
+        let request = req.text;
         let condition = request;
 
         //add_admin: Check if pattern is correct and group them to 0:input text , 1: command 2: userid, 3: name 4: telegram username
@@ -213,7 +224,7 @@ export class HappyBot {
                 this.#bot.sendMessage(req.from.id, (result) ? `موفق` : ` ناموفق.`);
                 break;
             }
-            case this.#commands.add_admin: //for when is sent with no argument
+            case this.#commands.add_admin: //with no arg ->  to check all possibility
                 {
                     if (util.isEmpty(_possible_admin)) {
                         this.#bot.sendMessage(req.from.id, "دستور ناقص است، لطفا نحوه وارد کردن پارامتر را مطالعه کنید."); return;
