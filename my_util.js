@@ -76,13 +76,18 @@ function WriteJson(path, Object) {
         return false;
     }
 }
-function ShortError(err, count){
+function ShortError(err, count) {
     return (!isEmpty(err.message)) ? `${err.message.substring(0, count)}...` : '';
+}
+function Compare_ignoreC(a, b) {
+    return typeof a === 'string' && typeof b === 'string'
+        ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
+        : a === b;
 }
 
 export {
     MiladiToShamdi, GetShamsiDay,
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
-    GetJson, WriteJson, ShortError
+    GetJson, WriteJson, ShortError, Compare_ignoreC
 }
