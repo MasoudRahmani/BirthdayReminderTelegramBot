@@ -1,6 +1,8 @@
 'use strict'
 import replaceInFile from "replace-in-file";
 import { copyFileSync, readFileSync, writeFileSync } from 'fs';
+import { readFile } from "fs/promises";
+import mime from 'mime-types';
 
 /**
  * 
@@ -58,7 +60,7 @@ function ResetPublicLog_HTML() {
         return false;
     }
 }
-function GetJson(path) {
+function GetJsonObj(path) {
     try {
         return JSON.parse(readFileSync(path));
     } catch (err) {
@@ -84,10 +86,25 @@ function Compare_ignoreC(a, b) {
         ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
         : a === b;
 }
+/**
+ * Asynchronously reads the entire contents of a file.
+ * If no encoding is specified , the data is returned as a Buffer object. Otherwise, the data will be a string.
+ * @param {string} path file path
+ * @param {string} _encoding null or file encoding
+ */
+async function GetFileAsync(path, _encoding = null) {
+    return await readFile(path, { encoding: _encoding });
+}
+
+function GetMimeType(filename) {
+    if (isEmpty(filename)) return '';
+    return mime.lookup(filename);
+}
 
 export {
     MiladiToShamdi, GetShamsiDay,
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
-    GetJson, WriteJson, ShortError, Compare_ignoreC
+    GetJsonObj, WriteJson, ShortError,
+    Compare_ignoreC, GetFileAsync, GetMimeType
 }
