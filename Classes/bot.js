@@ -52,8 +52,8 @@ export class HappyBot {
             util.isEmpty(_gKey) ||
             util.isEmpty(_Gmail) ||
             chatID == '') {
-            console.log('Bot arg is wrong.');
-            throw 'Wrong Args';
+            console.log('HappyBot Constructor Error: parameter is wrong.');
+            throw new Error('HappyBot Constructor Error: parameter is wrong.');
         }
         this.#token = token;
         this.#prvGroup = (chatID) ? chatID : this.#TestGroup;
@@ -63,8 +63,8 @@ export class HappyBot {
 
         this.#admins = util.GetJsonObj(this.#adminConfig);
         if (this.#admins == false) {
-            console.log("Bug: admin not loaded");
-            util.LogToPublic("Bug: admin not loaded");
+            console.log("Bug: admin config file is not loaded");
+            util.LogToPublic("Bug: admin config file is not loaded");
         }
     }
 
@@ -72,17 +72,15 @@ export class HappyBot {
         this.#bot = new TelegramBot(this.#token, { polling: true });
 
         this.#bot.on('polling_error', (err) => {
-            util.LogToPublic(`Pulling Err: ${util.ShortError(err, 200)}...`);
-            console.log(`Pulling Err: ${util.ShortError(err, 200)}...`); // => 'EFATAL'
+            util.LogToPublic(`HappyBot Pulling Error: ${util.ShortError(err, 200)}...`);
+            console.log(`HappyBot Pulling Error: ${util.ShortError(err, 200)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
             if (
                 req.from.is_bot ||
                 util.isEmpty(req.text) // it is not text - vide, photo or etc
             ) return;
-
             req.text = req.text.toLowerCase();
-
             let Admin = this.#admins.find((x) => { return x.UserId == req.from.id });
 
             switch (req.chat.type) {
@@ -92,7 +90,8 @@ export class HappyBot {
                         this.#AllGroups(req, Admin);
                     }
                     catch (err) {
-                        console.log(util.ShortError(err, 400));
+                        console.log(`Handling Group Chat Error: ${util.ShortError(err, 450)}`);
+                        util.LogToPublic(`Handling Group Chat Error: check console log.`);
                     }
                     break;
                 case "private": //Only answer to private messages
@@ -392,13 +391,13 @@ export class HappyBot {
                     contentType: anime.mimetype
                 }
             ).catch(err => {
-                console.log(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 300)}`);
-                util.LogToPublic(`Noch noCh,Sending random Anime Error: ${util.ShortError(err, 300)}`);
+                console.log(`Sending anime message Error: ${util.ShortError(err, 300)}`);
+                util.LogToPublic(`Sending anime message Error: ${util.ShortError(err, 300)}`);
             });
         }
         catch (err) {
-            console.log(`Anime Error: ${util.ShortError(err, 250)}...`);
-            util.LogToPublic(`Anime Error: ${util.ShortError(err, 250)}...`);
+            console.log(`HappyBot Anime Error: ${util.ShortError(err, 250)}...`);
+            util.LogToPublic(`HappyBot Anime Error: ${util.ShortError(err, 250)}...`);
             this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
         }
     }
