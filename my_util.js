@@ -38,10 +38,10 @@ function LogToPublic(txt) {
     const options = {
         files: './public_log/index.html',
         from: /<\/ol>/i, //i is to ignore case sensitivity
-        to: `<li class="list-group-item">${new Date().toLocaleString('fa-IR-u-nu-latn')}  --  ${txt}</li>
+        to: `<li class="list-group-item Multicolor">${new Date().toLocaleString('fa-IR-u-nu-latn')}  --  ${txt}</li>
             </ol>`
     };
-    replaceInFile(options).catch((err) => { console.log(err.message); });
+    replaceInFile(options).catch((err) => { console.log(`LogToPublic Error: ${err.message}`); });
 
 }
 function GetFileExtension(animeCover) {
@@ -55,8 +55,8 @@ function ResetPublicLog_HTML() {
         copyFileSync(template, htmlindex);
         return true;
     } catch (error) {
-        console.log(error.message);
-        LogToPublic(error.message);
+        console.log(`LogToPublic Error: ${error.message}`);
+        LogToPublic(`LogToPublic Error: ${error.message}`);
         return false;
     }
 }
@@ -73,8 +73,8 @@ function WriteJson(path, Object) {
         writeFileSync(path, JSON.stringify(Object), { encoding: "utf8", });
         return true;
     } catch (error) {
-        LogToPublic("Json Write Failed.");
-        console.log("Json Write Failed.");
+        LogToPublic(`Json Write Erro: ${ShortError(error, 200)}`);
+        console.log(`Json Write Erro: ${ShortError(error, 200)}`);
         return false;
     }
 }
