@@ -1,14 +1,21 @@
-.myMulticolor {
-    text-align: center;
-    font-size: 50px;
+.Multicolor {
     background: linear-gradient(to left,
             violet,
             indigo,
             blue,
-            green,
-            yellow,
-            orange,
-            red);
+            rgb(228, 148, 0),
+            rgb(182, 11, 125,0.7),
+            rgb(26, 78, 190),
+            darkgreen);
     -webkit-background-clip: text;
     color: transparent;
+}
+
+.LogList {
+    font-weight: 300;
+}
+
+body {
+    -moz-transform: scale(1.2); /* for Firefox, default 1*/
+    zoom:120%; /* For Chrome, IE, default 100%*/
 }
