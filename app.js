@@ -4,12 +4,12 @@
 process.env["NTBA_FIX_350"] = 1; //https://github.com/yagop/node-telegram-bot-api/issues/482
 process.env["NTBA_FIX_319"] = 1; //
 
-import { HappyBot } from './bot.js'
+import { HappyBot } from './Classes/bot.js'
 import http from 'http';
 import serveStatic from 'serve-static';
 import finalhandler from 'finalhandler';
 import * as schedule from 'node-schedule';
-import * as util from './my_util.js'
+import { LogToPublic, ShortError } from './my_util.js'
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document
@@ -51,14 +51,18 @@ async function Main() {
                 bot.SendHBD();
                 ran = true;
             }
-            console.log(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
-            util.LogToPublic(`${++counter} - Run: '${ran}' at: ${date.toLocaleString("sv-SE")}.\n\t next run at: ${rule.nextInvocationDate().toLocaleString("sv-SE")}`);
+            console.log(
+                `${date.toLocaleString("fa-IR-u-nu-latn")} ${++counter} - SendHBD Called: '${ran}'.\n` +
+                `\t next run at: ${rule.nextInvocationDate().toLocaleString("fa-IR-u-nu-latn")}`
+            );
+            LogToPublic(`${++counter} - SendHBD Called: '${ran}'.\n` +
+                `\t next run at: ${rule.nextInvocationDate().toLocaleString("fa-IR-u-nu-latn")}`);
         });
         console.log(`0 - First Run at: ${runner.nextInvocation()}`);
-        util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
+        LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
 
     } catch (err) {
-        console.log(`Main Entry Err: ${util.ShortError(err, 200)}`);
-        util.LogToPublic(`Main Entry Err: ${util.ShortError(err, 200)}`);
+        console.log(`Main Entry Err: ${ShortError(err, 200)}`);
+        LogToPublic(`Main Entry Err: ${ShortError(err, 200)}`);
     }
 }
