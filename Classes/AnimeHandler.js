@@ -25,13 +25,13 @@ export class AnimeHandler {
         await fetch(api()).then(rs => {
             apiResponse = rs;
         }).catch(err => {
-            console.log(`Random Anime Fetch Error: ${ShortError(err, 200)}`);
-            LogToPublic(`Random Anime Fetch Error: ${ShortError(err, 200)}`);
+            console.log(`RandomAnime Fetch Error: ${ShortError(err, 200)}`);
+            LogToPublic(`RandomAnime Fetch Error: ${ShortError(err, 200)}`);
             return false;
         });
         if (isEmpty(apiResponse)) {
-            console.log(`Anime Fetch Error`);
-            LogToPublic(`Anime Fetch Error`);
+            console.log(`RandomAnime Error: api response is empty.`);
+            LogToPublic(`RandomAnime Error: api response is empty.`);
             return false;
         }
         let jsonRS = await apiResponse.text();
