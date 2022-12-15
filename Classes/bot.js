@@ -6,19 +6,12 @@
 import * as util from '../my_util.js'
 import TelegramBot from 'node-telegram-bot-api';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import fetch from 'node-fetch';
-import { htmlToText } from 'html-to-text';
+import { AnimeHandler } from './AnimeHandler.js'
 
 //https://core.telegram.org/bots/api#formatting-options
 export class HappyBot {
     //#region field member
     #bot_server = "https://awhappybd.fly.dev/";
-    #AniListApi = {
-        Random: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
-        Popular: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
-        Trending: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
-    };
-    #malUrl = "https://myanimelist.net/anime/";
     #commands = {
         send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true',
         anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public', add_admin: 'new admin'
@@ -132,7 +125,7 @@ export class HappyBot {
         }
         else {
             this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(err => { util.LogToPublic(util.ShortError(err, 200)); });
-            this.#AnilistAnimeFun(req.from.id);
+            this.#RandomAnime(req.from.id);
         }
     }
     #AllGroups(req, admin) {
@@ -146,7 +139,7 @@ export class HappyBot {
             }
         }
         if (util.Compare_ignoreC(req.text, "@AWBirthdayBot anime")) {
-            this.#AnilistAnimeFun(req.chat.id);
+            this.#RandomAnime(req.chat.id);
         }
     }
     async #HandleOwnerRq(req) {
@@ -169,7 +162,7 @@ export class HappyBot {
             case this.#commands.fake: {
                 let photo = await this.#GetBirthDayPhoto();
                 let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
-                let happy = `${sir} @Masoud_rah\n${this.#HBDText}`;
+                let happy = `${sir} ${req.from.first_name || '' + req.from.last_name || ''}\n${this.#HBDText} \n\n\n@${req.from.username}`;
                 this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
                 ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
@@ -215,7 +208,7 @@ export class HappyBot {
                 break;
             }
             case this.#commands.anime: {
-                this.#AnilistAnimeFun(req.from.id);
+                this.#RandomAnime(req.from.id);
                 break;
             }
             case this.#commands.resetPublicHtml: {
@@ -356,80 +349,26 @@ export class HappyBot {
         return sent;
     }
     //#endregion
-
-    #ProcessAnimeApiResponse(response, api) {
-        let raw = JSON.parse(response);
-
-        raw = (
-            api == this.#AniListApi.Popular ||
-            api == this.#AniListApi.Trending
-        ) ? raw.results[0] : raw;
-
-        if (util.isEmpty(raw)) return false;
-
-        let image = raw.image || raw.cover
-        let ext = util.GetFileExtension(image);
-        let genres = raw.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
-        let desc = htmlToText(raw.description, { preserveNewlines: true });
-        let mimetyp = util.GetMimeType(ext || 'image/jpeg');
-
-        let anime_data = {
-            isAdult: raw.isAdult,
-            id: raw.id,
-            image: image,
-            ext: ext,
-            mimetype: mimetyp,
-            mal_link: this.#malUrl.concat(raw.malId),
-            t_romaji: raw.title.romaji,
-            t_english: raw.title.english,
-            t_native: raw.title.native,
-            status: raw.status,
-            type: raw.type,
-            releaseDate: raw.releaseDate || raw.releasedDate,
-            totalEpisodes: raw.totalEpisodes,
-            genres: genres,
-            desc: desc,
-            rating: raw.rating,
-            duration: raw.duration
-        }
-        return anime_data;
-
-    }
-
-    async #AnilistAnimeFun(userid) {
+    async #RandomAnime(userid) {
         try {
-            let response;
+            let ani_Handler = new AnimeHandler();
+            let anime = await ani_Handler.RandomAnimeAsync();
 
-            let anilist = Object.values(this.#AniListApi);
-            let randomApi = anilist[Math.ceil(Math.random() * anilist.length - 1)];
-
-            await fetch(randomApi()).then(x => {
-                response = x;
-            }).catch(err => {
-                console.log(`Random Anime Fetch Error: ${util.ShortError(err, 200)}`);
-                util.LogToPublic(`Random Anime Fetch Error: ${util.ShortError(err, 200)}`);
-                return;
-            })
-            if (util.isEmpty(response)) {
-                console.log(`Anime Fetch Error`);
-                util.LogToPublic(`Anime Fetch Error`);
-                this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
-            }
-            let anime_json = await response.text();
-
-            let anime = this.#ProcessAnimeApiResponse(anime_json, randomApi);
             if (anime == false) this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             //            if (!anime_data.image) return;
+            let hashtag_genre = anime.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
+            hashtag_genre = (anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : '';
+
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس یا اقبال 🎗\n` +
-                `${(anime.isAdult == "true") ? ' 🍑 Adult 🍑 ' : ''}\n` +
+                `${(anime.isAdult == "true") ? '🍑 Adult 🍑' : ''}\n` +
                 `<b>🍕عنوان:</b><a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
                 `<b>🍺نام:</b>${anime.t_english || anime.t_native}\n` +
                 `<b>🍷وضعیت:</b>${anime.status}\n` +
                 `<b>🍩 نوع پخش:</b>${anime.type}\n` +
                 `<b>🥂تاریخ شروع:</b>${anime.releaseDate}\n` +
                 `<b>🍚قسمت‌ها:</b>${anime.totalEpisodes}\n` +
-                `<b>☕️ژانر:</b>${(anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : ''}\n` +
+                `<b>☕️ژانر:</b>${hashtag_genre}\n` +
                 `<b>*رتبه: </b>${anime.rating}\n` +
                 `\n` +
                 `🥗 `;

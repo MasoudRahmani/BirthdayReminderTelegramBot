@@ -1,10 +1,10 @@
+
 import { htmlToText } from "html-to-text";
 import fetch from "node-fetch";
-import * as Anime from "./Anime";
+import { Anime } from './Anime.js'
 import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from "./../my_util.js";
 
-
-class AnimeHandler {
+export class AnimeHandler {
     #APIs = {
         Random: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
         Popular: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
@@ -14,8 +14,11 @@ class AnimeHandler {
 
     constructor() {
     }
-
-    async RandomAnime() {
+    /**
+     * Asynchronously returns anime data from available APIs
+     * @returns {Anime} anime data as Anime class
+     */
+    async RandomAnimeAsync() {
         let apiResponse;
         let api = this.#GetRandomApi();
 
@@ -48,7 +51,6 @@ class AnimeHandler {
 
         let image = raw.image || raw.cover
         let ext = GetFileExtension(image);
-        let genres = raw.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
         let desc = htmlToText(raw.description, { preserveNewlines: true });
         let mimetyp = GetMimeType(ext || 'image/jpeg');
 
@@ -67,7 +69,7 @@ class AnimeHandler {
             type: raw.type,
             releaseDate: raw.releaseDate || raw.releasedDate,
             totalEpisodes: raw.totalEpisodes,
-            genres: genres,
+            genres: raw.genres,
             desc: desc,
             rating: raw.rating,
             duration: raw.duration
@@ -81,5 +83,3 @@ class AnimeHandler {
     }
 
 }
-
-export { Anime, AnimeHandler};
