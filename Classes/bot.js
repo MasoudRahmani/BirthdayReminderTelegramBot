@@ -3,11 +3,9 @@
 //write a function to clear txt of reserved character of markdownv2
 // group slow mode time and send based on that time
 
-import * as util from './my_util.js'
+import * as util from '../my_util.js'
 import TelegramBot from 'node-telegram-bot-api';
-import * as fs from "fs/promises";
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import mime from 'mime-types';
 import fetch from 'node-fetch';
 import { htmlToText } from 'html-to-text';
 
@@ -26,7 +24,8 @@ export class HappyBot {
         anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public', add_admin: 'new admin'
     };
     #TestGroup = "-1001632481272";
-    #adminConfig = 'admins.json';
+    #adminConfig = './resource/admins.json';
+    #BdPhoto = "./resource/HBD.jpg";
     #admins = [];
     #token;
     #telegram_caption_limit = 1024;
@@ -47,7 +46,7 @@ export class HappyBot {
     };
     //#endregion
     /**
-     * 
+     * Create a Telegram Bot For AWhappyBdBot
      * @param {string} authentication token 
      * @param {string} Online Google SpreadSheet Src which has user birthdays on first sheet 
      * @param {string} Google Service Key Authentication Email
@@ -69,7 +68,7 @@ export class HappyBot {
         this.#gMail = _Gmail;
         this.#gKey = _gKey;
 
-        this.#admins = util.GetJson(this.#adminConfig);
+        this.#admins = util.GetJsonObj(this.#adminConfig);
         if (this.#admins == false) {
             console.log("Bug: admin not loaded");
             util.LogToPublic("Bug: admin not loaded");
@@ -372,7 +371,7 @@ export class HappyBot {
         let ext = util.GetFileExtension(image);
         let genres = raw.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
         let desc = htmlToText(raw.description, { preserveNewlines: true });
-        let mimetyp = mime.lookup(ext) || 'image/jpeg';
+        let mimetyp = util.GetMimeType(ext || 'image/jpeg');
 
         let anime_data = {
             isAdult: raw.isAdult,
@@ -472,7 +471,7 @@ export class HappyBot {
         if (util.isEmpty(sendto) || !util.isEmpty(err)) util.LogToPublic(err);
     }
     async #GetBirthDayPhoto() {
-        return await fs.readFile('HBD.jpg');
+        return await util.GetFileAsync(this.#BdPhoto);
     }
     //#endregion
 }
