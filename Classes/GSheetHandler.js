@@ -1,5 +1,5 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { isEmpty, LogToPublic, ShortError } from '../my_util.js';
+import { isEmpty, LogToPublic, ShortError } from '../utils.js';
 
 export class GSheetHandler {
 

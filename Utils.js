@@ -81,7 +81,13 @@ function WriteJson(path, Object) {
 function ShortError(err, count) {
     return (!isEmpty(err.message)) ? `${err.message.substring(0, count)}...` : '';
 }
-function Compare_ignoreC(a, b) {
+/**
+ * Check if equal and ignore case
+ * @param {string} a first string
+ * @param {string} b second
+ * @returns true or false
+ */
+function eq_ic(a, b) {
     return typeof a === 'string' && typeof b === 'string'
         ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
         : a === b;
@@ -106,5 +112,5 @@ export {
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
     GetJsonObj, WriteJson, ShortError,
-    Compare_ignoreC, GetFileAsync, GetMimeType
+    eq_ic, GetFileAsync, GetMimeType
 }

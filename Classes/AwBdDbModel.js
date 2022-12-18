@@ -1,4 +1,4 @@
-import { isEmpty } from '../my_util.js';
+import { isEmpty } from '../utils.js';
 
 export class AwBdDbModel {
     /**

@@ -2,7 +2,7 @@
 import { htmlToText } from "html-to-text";
 import fetch from "node-fetch";
 import { Anime } from './Anime.js'
-import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from "./../my_util.js";
+import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from "./../utils.js";
 
 export class AnimeHandler {
     #APIs = {
