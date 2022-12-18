@@ -23,7 +23,7 @@ const _Tests = {
     StartBotTest: 8
 };
 
-
+runtest(_Tests.ServerTest);
 runtest(_Tests.StartBotTest);
 
 async function runtest(id) {
@@ -71,8 +71,8 @@ function SheetHandlerTest() {
 }
 import { HappyBot } from './Classes/bot.js';
 async function StartBotTest(token) {
-
-    let bot = new HappyBot(token);
+    let h = SheetHandlerTest();
+    let bot = new HappyBot(token, h);
 
     await bot.Init();
     return bot;
@@ -84,7 +84,6 @@ async function FullAppTest(token, group) {
         ServerTest();
         let counter = 0;
 
-        let sheetHandler = SheetHandlerTest();
         let bot = await StartBotTest(token);
 
         const rule = new schedule.RecurrenceRule();
@@ -96,7 +95,7 @@ async function FullAppTest(token, group) {
             let date = new Date();
             ran = false;
             if (date.getHours() < 19 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
-                bot.SendHBD(sheetHandler, group);
+                bot.SendHBD(group);
                 ran = true;
             }
             console.log(`${date.toUTCString()} - ${++counter}. SendHBD Called: '${ran}'.\n` + `\t next run at: ${rule.nextInvocationDate().toUTCString()}`);
@@ -146,7 +145,7 @@ import finalhandler from 'finalhandler';
 function ServerTest() {
     var h = util.GetAppDirPath();
 
-    let publicPath = path.join(h, '../public_log/');
+    let publicPath = path.join(h, './public_log/');
 
     var serve = serveStatic(publicPath, { index: ['index.html', 'index.htm'] })
 
