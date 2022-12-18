@@ -3,6 +3,8 @@ import replaceInFile from "replace-in-file";
 import { copyFileSync, readFileSync, writeFileSync } from 'fs';
 import { readFile } from "fs/promises";
 import mime from 'mime-types';
+import path from "path";
+import { fileURLToPath } from "url";
 
 /**
  * 
@@ -64,6 +66,7 @@ function GetJsonObj(path) {
     try {
         return JSON.parse(readFileSync(path));
     } catch (err) {
+        console.log(ShortError(err));
         return false;
     }
 }
@@ -106,9 +109,11 @@ function GetMimeType(filename) {
     if (isEmpty(filename)) return '';
     return mime.lookup(filename);
 }
-
+function GetAppDirPath() {
+    return path.dirname(fileURLToPath(new URL(import.meta.url)))
+}
 export {
-    MiladiToShamdi, GetShamsiDay,
+    MiladiToShamdi, GetShamsiDay, GetAppDirPath,
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
     GetJsonObj, WriteJson, ShortError,
