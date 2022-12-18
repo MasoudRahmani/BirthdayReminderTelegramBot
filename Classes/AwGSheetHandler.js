@@ -16,7 +16,7 @@ export class AwSheetHandler extends GSheetHandler {
     }
 
     AddLog(val) {
-        this.Addrow(this.#sheetModel.LogSheet, val);
+        this.HandleNewRow(this.#sheetModel.LogSheet, val);
     }
     /**
      * was a celebrated message sent on date

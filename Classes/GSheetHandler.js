@@ -7,7 +7,7 @@ export class GSheetHandler {
     #Gmail;
     #GoogleKey;
     //----------
-    #Document;
+    #Document; //Dont use directly - try to use GetDocumentAsync instead
 
     constructor(gmail, key, id) {
         if (
@@ -33,10 +33,12 @@ export class GSheetHandler {
             LogToPublic(ShortError(err, 100));
         });
         await doc.loadInfo();
+        this.#Document = doc;
         return doc;
     }
     async GetsheetRowsById(sheetid) {
-        let sheet = this.#Document.sheetsById[sheetid];
+        let doc = await this.GetDocumentAsync();
+        let sheet = doc.sheetsById[sheetid];
         return await sheet.getRows();
     }
     /**
@@ -46,9 +48,10 @@ export class GSheetHandler {
      * - an object of header and value pairs (relative to the worksheet header columns)
      * - an array of values in column order
      */
-    async Addrow(sheetid, values) {
+    async HandleNewRow(sheetid, values) {
         let result;
-        let sheet = this.#Document.sheetsById[sheetid];
+        let doc = await this.GetDocumentAsync();
+        let sheet = doc.sheetsById[sheetid];
         await sheet.addRow(values)
             .then((x) => {
                 result = x;
