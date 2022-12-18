@@ -11,7 +11,7 @@ export class AwSheetHandler extends GSheetHandler {
      * @param {AwBdDbModel} AwsheetDbModel For functions
      */
     constructor(gmail, key, AwsheetDbModel) {
-        super(gmail, key, AwsheetDbModel.Url);
+        super(gmail, key, AwsheetDbModel.ID);
         this.#sheetModel = AwsheetDbModel;
     }
 

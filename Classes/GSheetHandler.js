@@ -3,28 +3,28 @@ import { isEmpty, LogToPublic, ShortError } from '../utils.js';
 
 export class GSheetHandler {
 
-    #SheetUrl;
+    #SheetId;
     #Gmail;
     #GoogleKey;
     //----------
     #Document;
 
-    constructor(gmail, key, url) {
+    constructor(gmail, key, id) {
         if (
             isEmpty(gmail) ||
             isEmpty(key) ||
-            isEmpty(url)) {
+            isEmpty(id)) {
             console.log('GSheetHandler Constructor Error: parameter is wrong.');
             throw new Error('GSheetHandler Constructor Error: parameter is wrong.');
         }
-        this.#SheetUrl = url; this.#Gmail = gmail; this.#GoogleKey = key;
+        this.#SheetId = id; this.#Gmail = gmail; this.#GoogleKey = key;
     }
 
     async GetDocumentAsync() {
         if (this.#Document) {
             return this.#Document;
         }
-        const doc = new GoogleSpreadsheet(this.#SheetUrl);
+        const doc = new GoogleSpreadsheet(this.#SheetId);
         await doc.useServiceAccountAuth({
             client_email: this.#Gmail,
             private_key: this.#GoogleKey

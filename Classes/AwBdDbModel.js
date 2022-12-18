@@ -3,18 +3,18 @@ import { isEmpty } from '../utils.js';
 export class AwBdDbModel {
     /**
      * 
-     * @param {Url} Url Google Sheet Url
+     * @param {string} ID Google Sheet ID
      * @param {int} UsersSheet Users Sheet id with birthdays
      * @param {int} LogSheet Log Sheet id to save send or errors
      */
     constructor(
-        Url,
+        ID,
         UsersSheet,
         LogSheet
     ) {
-        if (isEmpty(Url) || isEmpty(UsersSheet) || isEmpty(LogSheet))
+        if (isEmpty(ID) || isEmpty(UsersSheet) || isEmpty(LogSheet))
             throw new Error("AwBirthday Google Sheet Db Model: Parameter is empty.");
-        this.Url = Url;
+        this.ID = ID;
         this.UsersSheet = UsersSheet;
         this.LogSheet = LogSheet;
     }
