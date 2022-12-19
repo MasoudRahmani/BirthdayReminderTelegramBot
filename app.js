@@ -24,7 +24,7 @@ const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 let publicPath = `./public_log/`;
 let htmlindex = `./public_log/index.html`;
 
-if(!existsSync(htmlindex)){ //create indext base of template.
+if(!existsSync(htmlindex)){ //create indext based on template.
     ResetPublicLog_HTML();
 }
 
