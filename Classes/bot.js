@@ -3,9 +3,8 @@
 //write a function to clear txt of reserved character of markdownv2
 // group slow mode time and send based on that time
 
-import * as util from '../my_util.js'
+import * as util from '../utils.js'
 import TelegramBot from 'node-telegram-bot-api';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { AnimeHandler } from './AnimeHandler.js'
 
 //https://core.telegram.org/bots/api#formatting-options
@@ -16,50 +15,36 @@ export class HappyBot {
         send: 'send', fake: 'send fake', test_No_check: 'sendtest false', test_check: 'sendtest true',
         anime: 'anime', cmd: 'commands', resetPublicHtml: 'reset public', add_admin: 'new admin'
     };
-    #TestGroup = "-1001632481272";
+    #TG_TestGrp = "-1001632481272";
+    #TG_Group;
     #adminConfig = './resource/admins.json';
     #BdPhoto = "./resource/HBD.jpg";
     #admins = [];
     #token;
     #telegram_caption_limit = 1024;
-    #prvGroup;
-    #SheetSrc;
-    #gMail;
-    #gKey;
     #bot;
-    #gDocument;
+    #AWsheetHandler;
     #menTxt = "جناب آقای";
     #femaleTxt = "سرکار خانم";
     #HBDText = "در روز تولدتان بهترین ها را برایتان آرزومندیم.\nامیدواریم مسیر زندگیتان سرشار از لحظات خوش باشد.\nباتشکر گروه دنیای انیمه.\nଘ(੭ˊᵕˋ)੭* ੈ✩‧₊";
     fileOptions = {
-        // Explicitly specify the file name.
         filename: 'AWHappyBdPhoto',
-        // Explicitly specify the MIME type.
         contentType: 'image/jpeg'
     };
     //#endregion
     /**
      * Create a Telegram Bot For AWhappyBdBot
-     * @param {string} authentication token 
-     * @param {string} Online Google SpreadSheet Src which has user birthdays on first sheet 
-     * @param {string} Google Service Key Authentication Email
-     * @param {string} Google Service Key Authentication Private Key
-     * @param {number} ChatID - groupId to send happy birthday to (has default for test)
+     * @param {string} Telegran Bot authentication token 
+     * @param {AwSheetHandler} awGHandler Aw Handler for Google Sheet
      */
-    constructor(token, _GSheet, _Gmail, _gKey, chatID = null) {
+    constructor(token, GoogleSheetHandler) {
         if (util.isEmpty(token) ||
-            util.isEmpty(_GSheet) ||
-            util.isEmpty(_gKey) ||
-            util.isEmpty(_Gmail) ||
-            chatID == '') {
+            util.isEmpty(GoogleSheetHandler)) {
             console.log('HappyBot Constructor Error: parameter is wrong.');
             throw new Error('HappyBot Constructor Error: parameter is wrong.');
         }
         this.#token = token;
-        this.#prvGroup = (chatID) ? chatID : this.#TestGroup;
-        this.#SheetSrc = _GSheet;
-        this.#gMail = _Gmail;
-        this.#gKey = _gKey;
+        this.#AWsheetHandler = GoogleSheetHandler;
 
         this.#admins = util.GetJsonObj(this.#adminConfig);
         if (this.#admins == false) {
@@ -133,11 +118,11 @@ export class HappyBot {
 
         let isadmin = util.isEmpty(admin) ? false : true;
         if (isadmin) {
-            if (util.Compare_ignoreC(req.text, "@AWBirthdayBot god")) {
+            if (util.eq_ic(req.text, "@AWBirthdayBot god")) {
                 this.#bot.sendMessage(req.chat.id, " No eye to see, No ear to listen.\n No body to touch to feel warm. \n No hand to comfort.\n\n Yet you seek...");
             }
         }
-        if (util.Compare_ignoreC(req.text, "@AWBirthdayBot anime")) {
+        if (util.eq_ic(req.text, "@AWBirthdayBot anime")) {
             this.#RandomAnime(req.chat.id);
         }
     }
@@ -154,7 +139,7 @@ export class HappyBot {
 
         switch (condition) {
             case this.#commands.send: {
-                this.SendHBD().then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                this.SendHBD(this.#TG_Group).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
@@ -162,19 +147,19 @@ export class HappyBot {
                 let photo = await this.#GetBirthDayPhoto();
                 let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
                 let happy = `${sir} ${req.from.first_name || '' + req.from.last_name || ''}\n${this.#HBDText} \n\n\n@${req.from.username}`;
-                this.#bot.sendPhoto(this.#TestGroup, photo, { caption: happy, parse_mode: '' }, this.fileOptions
+                this.#bot.sendPhoto(this.#TG_TestGrp, photo, { caption: happy, parse_mode: '' }, this.fileOptions
                 ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             case this.#commands.test_No_check: {
 
-                this.#Send_HBD(this.#TestGroup, false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                this.#Send_HBD(this.#TG_TestGrp, false).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
             case this.#commands.test_check: {
-                this.#Send_HBD(this.#TestGroup, true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
+                this.#Send_HBD(this.#TG_TestGrp, true).then(result => { this.#bot.sendMessage(req.from.id, `result: ${result}`); }
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
                 break;
             }
@@ -251,39 +236,42 @@ export class HappyBot {
     //#region <Birthday Logic>
     /**
      * Get AW Birthdays and Sent Happy Birthday to users which have aged today.
-     * @returns celebrated users or empty
+     * @param {string} Telegram group to send happy birthday
+     * @returns Celebrated Users as string
      */
-    async SendHBD() {
-        return await this.#Send_HBD(this.#prvGroup, true);
+    async SendHBD(TG_GroupChatID = null) {
+        if (TG_GroupChatID == '') throw new Error('Group Chat Id Cannot be Empty String.');
+
+        this.#TG_Group = (TG_GroupChatID) ? TG_GroupChatID : this.#TG_TestGrp;
+        return await this.#Send_HBD(this.#TG_Group, true);
     }
     /**
-     * @param {*} customgrp Telegram Private Group to sent happy bd to!
+     * @param {string} customgrp Telegram Private Group to sent happy bd to!
      * @param {Boolean} check_if_was_sent True to check if we send happy bd today or no, if was sent we dont send anymore, False we send whether was sent or not
      * @returns result of sending which is celebrated user or "". on exception err msg is returned.
      */
     async #Send_HBD(customgrp, check_if_was_sent) {
         try {
-            if (util.isEmpty(customgrp)) customgrp = this.#prvGroup;
-            //if (util.isEmpty(check_if_was_sent)) util.LogToPublic("Send_HBD - check_if_was_sent is empty");
+            if (util.isEmpty(customgrp)) customgrp = this.#TG_TestGrp;
 
-            this.#gDocument = await this.#GetGoogleDoc();
             let ir_D = util.GetShamsiDay();
             let ir_M = util.GetShamsiMonth();
 
             if (check_if_was_sent) {
-                let was_sent = await this.#WasTodaySent();
-                if (was_sent) return "Was sent.";
+                let today = util.MiladiToShamdi();
+                let was_sent = await this.#AWsheetHandler.WasItSent(today);
+                if (was_sent) return `${today} Was sent.`;
             }
 
             let photo = await this.#GetBirthDayPhoto();
             let celebrated = "";
-            await this.#GetOnlineBirthdays().then(async u => {
+            await this.#AWsheetHandler.GetBirthdays().then(async rows => {
                 let to_celebrate = [];
-                let happybd = "";
-                u.forEach(r => {
+                rows.forEach(r => {
                     let sir = "";
                     if (util.isEmpty(r.Deleted) | util.isEmpty(r.Day) | util.isEmpty(r.Month)) return;
-                    if (r.Deleted.toLowerCase() == 'false') {
+
+                    if (util.eq_ic(r.Deleted, 'false')) {
                         if (!util.isEmpty(r.Day) & !util.isEmpty(r.Month)) {
                             if (parseInt(r.Day) == ir_D & parseInt(r.Month) == ir_M) {
                                 sir = (r.Men == 'TRUE') ? this.#menTxt : this.#femaleTxt;
@@ -296,7 +284,7 @@ export class HappyBot {
                     }
                 });
                 if (util.isEmpty(celebrated) == false) {
-                    happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
+                    let happybd = `${to_celebrate.join("\n")}\n${this.#HBDText}`;
 
                     await this.#bot.sendPhoto(customgrp, photo, { caption: happybd }, this.fileOptions
                     ).then((/*x*/) => { if (check_if_was_sent) this.#LogToXL(celebrated.substring(3)); }
@@ -310,44 +298,13 @@ export class HappyBot {
             });
             return celebrated;
         } catch (err) {
-            this.#LogToXL('', `Overall sent Err: ${util.ShortError(err, 200)}`);
-            return (util.ShortError(err, 200));
+            console.log(`Overall SentHBD Error: ${util.ShortError(err, 200)}`);
+            this.#LogToXL('', `Overall SentHBD Error: ${util.ShortError(err, 200)}`);
+            return util.ShortError(err, 200);
         }
     }
     //#endregion
-
-    //#region <Google Api functions>
-    async #GetGoogleDoc() {
-        if (this.#gDocument) {
-            return this.#gDocument;
-        }
-        const doc = new GoogleSpreadsheet(this.#SheetSrc);
-        await doc.useServiceAccountAuth({
-            client_email: this.#gMail,
-            private_key: this.#gKey
-        }).catch(err => {
-            console.log(util.ShortError(err, 200));
-            util.LogToPublic(util.ShortError(err, 100));
-        });
-        await doc.loadInfo();
-        return doc;
-    }
-    async #GetOnlineBirthdays() {
-
-        let sheet = this.#gDocument.sheetsById[0];
-        return await sheet.getRows();
-    }
-    async #WasTodaySent() {
-        let today = util.MiladiToShamdi();
-
-        let sent = false;
-        let sheet = this.#gDocument.sheetsById[946533461];
-        let rows = await sheet.getRows();
-
-        rows.forEach(r => { if (r.RunDate == today & util.isEmpty(r.Error)) { sent = true; return; } }) //check -> Sent == FALSE -> line 158 (just dont log false - wase of time though)
-        return sent;
-    }
-    //#endregion
+    //#region <Utility functions>
     async #RandomAnime(userid) {
         try {
             let ani_Handler = new AnimeHandler();
@@ -401,15 +358,15 @@ export class HappyBot {
             this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
         }
     }
-    //#region <Utility functions>
-    #LogToXL(sendto, err = '') {
-        let sheet = this.#gDocument.sheetsById[946533461];
-        sheet.addRow({ RunDate: util.MiladiToShamdi(), Sent: (sendto) ? 'TRUE' : 'FALSE', Sent_To: sendto, Error: err });
-
-        if (util.isEmpty(sendto) || !util.isEmpty(err)) util.LogToPublic(err);
-    }
     async #GetBirthDayPhoto() {
         return await util.GetFileAsync(this.#BdPhoto);
+    }
+
+    #LogToXL(sendto, err = '') {
+        let val = { RunDate: util.MiladiToShamdi(), Sent: (sendto) ? 'TRUE' : 'FALSE', Sent_To: sendto, Error: err };
+        this.#AWsheetHandler.AddLog(val);
+
+        if (util.isEmpty(sendto) || !util.isEmpty(err)) util.LogToPublic(err);
     }
     //#endregion
 }
