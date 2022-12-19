@@ -9,9 +9,10 @@ import http from 'http';
 import serveStatic from 'serve-static';
 import finalhandler from 'finalhandler';
 import * as schedule from 'node-schedule';
-import { LogToPublic, ShortError } from './utils.js';
+import { LogToPublic, ResetPublicLog_HTML, ShortError } from './utils.js';
 import { AwSheetHandler } from './Classes/AwGSheetHandler.js';
 import { AwBdDbModel } from './Classes/AwBdDbModel.js';
+import { existsSync } from 'fs';
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document;
@@ -21,6 +22,11 @@ const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 
 
 let publicPath = `./public_log/`;
+let htmlindex = `./public_log/index.html`;
+
+if(!existsSync(htmlindex)){ //create indext base of template.
+    ResetPublicLog_HTML();
+}
 
 var serve = serveStatic(publicPath, { index: ['index.html', 'index.htm'] })
 

@@ -19,8 +19,9 @@ const TestGroup = privateConfig[1].TG_privateGroup;
 
 
 const _Tests = {
-    FullAppTest: 1, ScheduleTest: 2, ServerTest: 3, TelegramModuleTest: 4, GspreadSheetTest: 5, AnimeHandlerTest: 6, SheetHandlerTest: 7,
-    StartBotTest: 8
+    FullAppTest: 1, //Do not run With other test. run it alone
+    ScheduleTest: 2, ServerTest: 3, TelegramModuleTest: 4, GspreadSheetTest: 5,
+    AnimeHandlerTest: 6, SheetHandlerTest: 7, StartBotTest: 8
 };
 
 runtest(_Tests.ServerTest);
@@ -141,8 +142,13 @@ function ScheduleTest(delegate) {
 import http from 'http';
 import serveStatic from 'serve-static';
 import finalhandler from 'finalhandler';
-
+import { existsSync } from 'fs';
 function ServerTest() {
+    let htmlindex = `./public_log/index.html`;
+
+    if (!existsSync(htmlindex)) {
+        util.ResetPublicLog_HTML();
+    }
     var h = util.GetAppDirPath();
 
     let publicPath = path.join(h, './public_log/');
