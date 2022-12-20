@@ -13,8 +13,8 @@
 </head>
 
 <body>
-  <div class="container-fluid w-75 p-5 ">
-    <header class="pb-3 mb-4 border-bottom">
+  <div class="container-fluid w-75 p-lg-5" style="margin-top: 20px;">
+    <header class="mb-2 border-bottom">
       <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
         <?xml version="1.0" encoding="UTF-8"?>
         <svg enable-background="new 0 0 512 512" width="50" height="52" class="me-2" version="1.1"  viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
@@ -31,6 +31,16 @@
         <span class="fs-4 fw-bold">AW HappyBD Log</span>
       </a>
     </header>
+    <div class="d-flex justify-content-evenly align-items-center mb-2">
+      <button type="button" class="btn btn-outline-success">
+        Local Time: <span class="badge bg-success" id="CurrentTime">
+          <span id="CurrentTimeUTC">12/21/2022, 1:03:28 AM</span>
+      </button>
+        <button type="button" class="btn btn-outline-primary">
+          UTC Time: <span class="badge bg-primary" id="CurrentTimeUTC">
+            <span id="CurrentTimeUTC">Tue, 20 Dec 2022 21:29:31 GMT</span>
+        </button>
+      </div>  
     <div class="p-5 mb-4 bg-light rounded-3">
       <div class="container-fluid">
         <ol class="list-group-flush  list-group-numbered LogList" style="color:Purple">
@@ -39,5 +49,11 @@
     </div>
   </div>
 </body>
-
+<script>
+  setInterval(() => {
+    var d = new Date();
+  document.getElementById('CurrentTimeUTC').textContent = d.toUTCString();      
+  document.getElementById('CurrentTime').textContent = d.toLocaleString();      
+  }, 700);
+</script>
 </html>
