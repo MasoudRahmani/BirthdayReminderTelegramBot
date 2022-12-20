@@ -7,8 +7,11 @@ import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from 
 export class AnimeHandler {
     #APIs = {
         Random: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
+        Random1: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
+        Random2: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
         Popular: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
-        Trending: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+        Trending: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
+        Trending1: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
     };
     #malUrl = "https://myanimelist.net/anime/";
 
