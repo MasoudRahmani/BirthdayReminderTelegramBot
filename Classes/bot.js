@@ -313,7 +313,7 @@ export class HappyBot {
             if (anime == false) this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
             //            if (!anime_data.image) return;
             let hashtag_genre = anime.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
-            hashtag_genre = (anime.genres.length > 0) ? '#'.concat(anime.genres.join(", #")) : '';
+            hashtag_genre = (hashtag_genre.genres.length > 0) ? '#'.concat(hashtag_genre.genres.join(", #")) : '';
 
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس یا اقبال 🎗\n` +
