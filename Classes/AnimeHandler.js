@@ -6,13 +6,26 @@ import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from 
 
 export class AnimeHandler {
     #APIs = {
-        Random: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
-        Random1: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
-        Random2: () => { return "https://api.consumet.org/meta/anilist/random-anime" },
-        Popular: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
-        Trending: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` },
-        Trending1: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+        Random:
+        {
+            Chance: 3,
+            Type: "A",
+            Api: () => { return "https://api.consumet.org/meta/anilist/random-anime" }
+        },
+        Popular:
+        {
+            Chance: 1,
+            Type: "B",
+            Api: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+        },
+        Trending:
+        {
+            Chance: 2,
+            Type: "B",
+            Api: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+        },
     };
+
     #malUrl = "https://myanimelist.net/anime/";
 
     constructor() {
@@ -23,7 +36,8 @@ export class AnimeHandler {
      */
     async RandomAnimeAsync() {
         let apiResponse;
-        let api = this.#GetRandomApi();
+        let api_data = this.#GetRandomApi();
+        let api = api_data.Api;
 
         await fetch(api()).then(rs => {
             apiResponse = rs;
@@ -39,15 +53,14 @@ export class AnimeHandler {
         }
         let jsonRS = await apiResponse.text();
 
-        return this.#ProcessAnimeApiResponse(jsonRS, api);
+        return this.#ProcessAnimeApiResponse(jsonRS, api_data);
 
     }
-    #ProcessAnimeApiResponse(response, api) {
+    #ProcessAnimeApiResponse(response, api_dat) {
         let raw = JSON.parse(response);
 
         raw = (
-            api == this.#APIs.Popular ||
-            api == this.#APIs.Trending
+            api_dat.Type == "B"
         ) ? raw.results[0] : raw;
 
         if (isEmpty(raw)) return false;
@@ -79,10 +92,18 @@ export class AnimeHandler {
         }
         return anime_data;
     }
-
+    /**
+     * @returns api: { Chance: number; Type: string; Api: () => string; }
+     */
     #GetRandomApi() {
-        let _APIfn = Object.values(this.#APIs);
-        return _APIfn[Math.ceil(Math.random() * _APIfn.length - 1)];
+        let _APIs = Object.values(this.#APIs);
+        let selectionPot = [];
+        _APIs.forEach(api => {
+            for (let i = 0; i < api.Chance; i++) {
+                selectionPot.push(api);
+            }
+        });
+        return selectionPot[Math.ceil(Math.random() * selectionPot.length - 1)];
     }
 
 }
