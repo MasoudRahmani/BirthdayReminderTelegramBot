@@ -24,7 +24,7 @@ const GoogleKey = process.env.key.replace(/\\n/g, "\n")
 let publicPath = `./public_log/`;
 let htmlindex = `./public_log/index.html`;
 
-if(!existsSync(htmlindex)){ //create indext based on template.
+if (!existsSync(htmlindex)) { //create indext based on template.
     ResetPublicLog_HTML();
 }
 
@@ -54,7 +54,7 @@ async function Main() {
         rule.minute = 0 // needed for every 
 
         let ran = false;
-        let runner = schedule.scheduleJob(rule, () => {
+        /*let runner =*/ schedule.scheduleJob(rule, () => {
             let date = new Date();
             ran = false;
             if (date.getHours() < 19 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
@@ -62,14 +62,14 @@ async function Main() {
                 ran = true;
             }
             console.log(
-                `${date.toUTCString()} - ${++counter}. SendHBD Called: '${ran}'.\n` +
-                `\t next run at: ${rule.nextInvocationDate().toUTCString()}`
+                `${++counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
+                `\t Next run at: (${rule.nextInvocationDate().toUTCString()})`
             );
-            LogToPublic(`${++counter}. SendHBD Called: '${ran}'.\n` +
-                `\t next run at: ${rule.nextInvocationDate().toUTCString()}`);
+            LogToPublic(`${++counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
+                `\t Next run at: (${rule.nextInvocationDate().toUTCString()})`);
         });
-        console.log(`0 - First Run at: ${runner.nextInvocation().toUTCString()}`);
-        LogToPublic(`0 - First Run at: ${runner.nextInvocation().toUTCString()}`);
+        console.log(`0 - First Run at: (${rule.nextInvocationDate().toUTCString()})`);
+        LogToPublic(`0 - First Run at: (${rule.nextInvocationDate().toUTCString()})`);
 
     } catch (err) {
         console.log(`Main Entry Err: ${ShortError(err, 200)}`);

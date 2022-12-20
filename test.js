@@ -24,8 +24,8 @@ const _Tests = {
     AnimeHandlerTest: 6, SheetHandlerTest: 7, StartBotTest: 8
 };
 
-runtest(_Tests.ServerTest);
-runtest(_Tests.StartBotTest);
+runtest(_Tests.ScheduleTest);
+//runtest(_Tests.StartBotTest);
 
 async function runtest(id) {
     switch (id) {
@@ -120,7 +120,7 @@ function ScheduleTest(delegate) {
         //rule.minute = 0 // needed for every 
 
         let ran = false;
-        let runner = schedule.scheduleJob(rule, () => {
+        schedule.scheduleJob(rule, () => {
             let date = new Date();
             ran = false;
             if (date.getHours() < 19 & date.getHours() > 1) { //in case server is utc, so i can send msg 5am in tehran
@@ -128,11 +128,11 @@ function ScheduleTest(delegate) {
                 ran = true;
             }
             console.log(
-                `${date.toUTCString()} - ${++counter}. SendHBD Called: '${ran}'.\n` +
-                `\t next run at: ${rule.nextInvocationDate().toUTCString()}`
+                `${++counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
+                `\t Next run at: (${rule.nextInvocationDate().toUTCString()})\n`
             );
         });
-        console.log(`0 - First Run at: ${runner.nextInvocation().toUTCString()}`);
+        console.log(`0 - First Run at: (${rule.nextInvocationDate().toUTCString()})`);
 
     } catch (err) {
         console.log(`Main Entry Err: ${util.ShortError(err, 200)}`);
