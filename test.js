@@ -24,7 +24,7 @@ const _Tests = {
     AnimeHandlerTest: 6, SheetHandlerTest: 7, StartBotTest: 8
 };
 
-runtest(_Tests.ScheduleTest);
+runtest(_Tests.AnimeHandlerTest);
 //runtest(_Tests.StartBotTest);
 
 async function runtest(id) {
@@ -187,6 +187,7 @@ async function GspreadSheetTest() {
 import { AnimeHandler } from './Classes/AnimeHandler.js';
 async function AnimeHandlerTest() {
     var ah = new AnimeHandler();
-    let f = await ah.RandomAnime();
-    return f;
+    let anime = await ah.RandomAnimeAsync();
+
+    return anime;
 }
