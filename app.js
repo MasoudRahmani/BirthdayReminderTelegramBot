@@ -65,7 +65,7 @@ async function Main() {
                 `${++counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
                 `\t Next run at: (${rule.nextInvocationDate().toUTCString()})`
             );
-            LogToPublic(`${++counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
+            LogToPublic(`${counter}. SendHBD Called: '${ran}' at (${date.toUTCString()}).\n` +
                 `\t Next run at: (${rule.nextInvocationDate().toUTCString()})`);
         });
         console.log(`0 - First Run at: (${rule.nextInvocationDate().toUTCString()})`);

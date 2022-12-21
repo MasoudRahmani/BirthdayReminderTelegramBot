@@ -24,7 +24,7 @@ const _Tests = {
     AnimeHandlerTest: 6, SheetHandlerTest: 7, StartBotTest: 8
 };
 
-runtest(_Tests.ServerTest);
+runtest(_Tests.FullAppTest);
 //runtest(_Tests.StartBotTest);
 
 async function runtest(id) {
@@ -100,7 +100,7 @@ async function FullAppTest(token, group) {
                 ran = true;
             }
             console.log(`${date.toUTCString()} - ${++counter}. SendHBD Called: '${ran}'.\n` + `\t next run at: ${rule.nextInvocationDate().toUTCString()}`);
-            util.LogToPublic(`${++counter}. SendHBD Called: '${ran}'.\n` + `\t next run at: ${rule.nextInvocationDate().toUTCString()}`);
+            util.LogToPublic(`${counter}. SendHBD Called: '${ran}'.\n` + `\t next run at: ${rule.nextInvocationDate().toUTCString()}`);
         });
 
         console.log(`0 - First Run at: ${runner.nextInvocation()}`); util.LogToPublic(`0 - First Run at: ${runner.nextInvocation()}`);
