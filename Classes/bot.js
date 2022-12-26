@@ -146,7 +146,7 @@ export class HappyBot {
             case this.#commands.fake: {
                 let photo = await this.#GetBirthDayPhoto();
                 let sir = `${this.#menTxt} - ${this.#femaleTxt}:`;
-                let happy = `${sir} ${req.from.first_name || '' + req.from.last_name || ''}\n${this.#HBDText} \n\n\n@${req.from.username}`;
+                let happy = `${sir} ${req.from.first_name || ''} ${req.from.last_name || ''}\n${this.#HBDText} \n\n\n@${req.from.username}`;
                 this.#bot.sendPhoto(this.#TG_TestGrp, photo, { caption: happy, parse_mode: '' }, this.fileOptions
                 ).then(result => { this.#bot.sendMessage(req.from.id, `result: ${(result) ? true : false}`); } //make result readable
                 ).catch(err => { this.#bot.sendMessage(req.from.id, util.ShortError(err, 200)) });
