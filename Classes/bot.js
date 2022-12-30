@@ -318,16 +318,16 @@ export class HappyBot {
             let caption =
                 `ـ 🇯🇵انیمه یکهویی 🎲  🎗 یا شانس یا اقبال 🎗\n` +
                 `${(anime.isAdult == "true") ? '🍑 Adult 🍑' : ''}\n` +
-                `<b>🍕عنوان:</b><a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
-                `<b>🍺نام:</b>${anime.t_english || anime.t_native}\n` +
-                `<b>🍷وضعیت:</b>${anime.status}\n` +
-                `<b>🍩 نوع پخش:</b>${anime.type}\n` +
-                `<b>🥂تاریخ شروع:</b>${anime.releaseDate}\n` +
-                `<b>🍚قسمت‌ها:</b>${anime.totalEpisodes}\n` +
-                `<b>☕️ژانر:</b>${hashtag_genre}\n` +
-                `<b>*رتبه: </b>${anime.rating}\n` +
+                `🍕<b>عنوان: </b><a href="${anime.mal_link}">${anime.t_romaji}</a>\n` +
+                `🍺<b>نام: </b>${anime.t_english || anime.t_native}\n` +
+                `🍷<b>وضعیت: </b>${anime.status}\n` +
+                `🍩<b> نوع پخش: </b>${anime.type}\n` +
+                `🥂<b>تاریخ شروع: </b>${anime.releaseDate}\n` +
+                `🍚<b>قسمت‌ها: </b>${anime.totalEpisodes}\n` +
+                `☕️<b>ژانر: </b>${hashtag_genre}\n` +
+                `🏆<b>رتبه: </b>${anime.rating}\n` +
                 `\n` +
-                `🥗 `;
+                `💭 `;
             let remaining = this.#telegram_caption_limit - caption.length;
 
             let caption_p2 = anime.desc.substring(0, remaining - 4);

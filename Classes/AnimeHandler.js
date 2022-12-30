@@ -5,24 +5,26 @@ import { Anime } from './Anime.js'
 import { GetFileExtension, GetMimeType, isEmpty, LogToPublic, ShortError } from "./../utils.js";
 
 export class AnimeHandler {
+    #max_Page = 10;
+    #max_PerPage = 49;
     #APIs = {
         Random:
         {
-            Chance: 3,
+            Chance: 6,
             Type: "A",
             Api: () => { return "https://api.consumet.org/meta/anilist/random-anime" }
         },
         Popular:
         {
-            Chance: 1,
+            Chance: 2,
             Type: "B",
-            Api: () => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+            Api: (p, perP) => { return `https://api.consumet.org/meta/anilist/popular?page=${Math.ceil((Math.random() * p))}&perPage=${perP}` }
         },
         Trending:
         {
             Chance: 2,
             Type: "B",
-            Api: () => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * 5))}&perPage=1` }
+            Api: (p, perP) => { return `https://api.consumet.org/meta/anilist/trending?page=${Math.ceil((Math.random() * p))}&perPage=${perP}` }
         },
     };
 
@@ -30,71 +32,53 @@ export class AnimeHandler {
 
     constructor() {
     }
+
     /**
      * Asynchronously returns anime data from available APIs
      * @returns {Anime} anime data as Anime class
      */
     async RandomAnimeAsync() {
+        let status;
         let apiResponse;
         let api_data = this.#GetRandomApi();
-        let api = api_data.Api;
+        let { page, select_numb } = this.#randPage();
 
-        await fetch(api()).then(rs => {
-            apiResponse = rs;
-        }).catch(err => {
-            console.log(`RandomAnime Fetch Error: ${ShortError(err, 200)}`);
-            LogToPublic(`RandomAnime Fetch Error: ${ShortError(err, 200)}`);
+        const fetch_fnThen = (rs) => { apiResponse = rs; }
+        const fetch_fnCatch = (err) => {
+            console.log(`RandomAnime Fetch Error: ${ShortError(err, 300)}`);
+            LogToPublic(`RandomAnime Fetch Error: ${ShortError(err, 300)}`);
             return false;
-        });
-        if (isEmpty(apiResponse)) {
-            console.log(`RandomAnime Error: api response is empty.`);
-            LogToPublic(`RandomAnime Error: api response is empty.`);
-            return false;
+        }
+        switch (api_data.Type) {
+            case "B":
+                await fetch(api_data.Api(page, this.#max_PerPage)).then(fetch_fnThen).catch(fetch_fnCatch);
+                break;
+            case "A":
+                await fetch(api_data.Api()).then(fetch_fnThen).catch(fetch_fnCatch);
+                break;
+        }
+        status = apiResponse.status;
+        if (isEmpty(apiResponse) || status != 200) {
+            let r = await apiResponse.text();
+            console.log(`RandomAnime Error: api response is empty or is down. ${r}`);
+            LogToPublic(`RandomAnime Error: api response is empty or is down. ${r}`);
+            return { r, status };
         }
         let jsonRS = await apiResponse.text();
 
-        return this.#ProcessAnimeApiResponse(jsonRS, api_data);
+        let rawData = JSON.parse(jsonRS);
 
-    }
-    #ProcessAnimeApiResponse(response, api_dat) {
-        let raw = JSON.parse(response);
+        rawData = (
+            api_data.Type == "B"
+        ) ? rawData.results[select_numb] : rawData;
 
-        raw = (
-            api_dat.Type == "B"
-        ) ? raw.results[0] : raw;
+        let anime = this.#ProcessAnimeApiResponse(rawData);
+        return { anime, status };
 
-        if (isEmpty(raw)) return false;
-
-        let image = raw.image || raw.cover
-        let ext = GetFileExtension(image);
-        let desc = htmlToText(raw.description, { preserveNewlines: true });
-        let mimetyp = GetMimeType(ext || 'image/jpeg');
-
-        let anime_data = new Anime();
-        anime_data = {
-            isAdult: raw.isAdult,
-            id: raw.id,
-            image: image,
-            ext: ext,
-            mimetype: mimetyp,
-            mal_link: this.#malUrl.concat(raw.malId),
-            t_romaji: raw.title.romaji,
-            t_english: raw.title.english,
-            t_native: raw.title.native,
-            status: raw.status,
-            type: raw.type,
-            releaseDate: raw.releaseDate || raw.releasedDate,
-            totalEpisodes: raw.totalEpisodes,
-            genres: raw.genres,
-            desc: desc,
-            rating: raw.rating,
-            duration: raw.duration
-        }
-        return anime_data;
     }
     /**
-     * @returns api: { Chance: number; Type: string; Api: () => string; }
-     */
+    * @returns api: { Chance: number; Type: string; Api: () => string; }
+    */
     #GetRandomApi() {
         let _APIs = Object.values(this.#APIs);
         let selectionPot = [];
@@ -105,5 +89,44 @@ export class AnimeHandler {
         });
         return selectionPot[Math.ceil(Math.random() * selectionPot.length - 1)];
     }
+    #randPage() {
+        let p, pp;
+        p = Math.ceil(Math.random() * (this.#max_Page - 1));
+        pp = Math.ceil(Math.random() * (this.#max_PerPage - 1));
+        return { page: p, select_numb: pp };
+    }
 
+    #ProcessAnimeApiResponse(raw) {
+
+        if (isEmpty(raw)) return false;
+
+        let image = raw.image || raw.cover
+        let ext = GetFileExtension(image);
+        let desc = htmlToText(raw.description, { preserveNewlines: true });
+        let mimetyp = GetMimeType(ext || 'image/jpeg');
+
+        desc.replaceAll("\n\n\n\n", "\n\n").replaceAll("\n\n\n", "\n\n");
+
+        let anime_data = new Anime();
+        anime_data = {
+            isAdult: raw.isAdult,
+            id: raw.id,
+            image: image,
+            ext: ext,
+            mimetype: mimetyp,
+            mal_link: this.#malUrl.concat(raw.malId),
+            t_romaji: raw.title.romaji || "",
+            t_english: raw.title.english || "",
+            t_native: raw.title.native || "",
+            status: raw.status || "",
+            type: raw.type || "",
+            releaseDate: raw.releaseDate || raw.releasedDate || "",
+            totalEpisodes: raw.totalEpisodes || "",
+            genres: raw.genres,
+            desc: desc || "",
+            rating: raw.rating || "",
+            duration: raw.duration || ""
+        }
+        return anime_data;
+    }
 }
