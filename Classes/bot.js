@@ -308,11 +308,11 @@ export class HappyBot {
     async #RandomAnime(userid) {
         try {
             let ani_Handler = new AnimeHandler();
-            let anime = await ani_Handler.RandomAnimeAsync();
+            let { anime, status } = await ani_Handler.RandomAnimeAsync();
 
-            if (anime == false) this.#bot.sendMessage(userid, "خطا در دریافت اطلاعات، لطفا بعدا تلاش فرمایید.");
-            //            if (!anime_data.image) return;
-            let hashtag_genre = anime.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") });
+            if (status != 200) { this.#bot.sendMessage(userid, `خطا: ${anime}`); return; }
+
+            let hashtag_genre = (Array.isArray(anime.genres)) ? anime.genres.map((x) => { return x.trim().replaceAll(" ", "_").replaceAll("-", "_") }) : "";
             hashtag_genre = (hashtag_genre.length > 0) ? '#'.concat(hashtag_genre.join(", #")) : '';
 
             let caption =
@@ -342,9 +342,7 @@ export class HappyBot {
                     parse_mode: "HTML"
                 },
                 {
-                    // Explicitly specify the file name.
                     filename: `${anime.id}${anime.ext}`,
-                    // Explicitly specify the MIME type.
                     contentType: anime.mimetype
                 }
             ).catch(err => {
