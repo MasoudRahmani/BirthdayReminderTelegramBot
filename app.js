@@ -13,6 +13,7 @@ import { LogToPublic, ResetPublicLog_HTML, ShortError } from './utils.js';
 import { AwSheetHandler } from './Classes/AwGSheetHandler.js';
 import { AwBdDbModel } from './Classes/AwBdDbModel.js';
 import { existsSync } from 'fs';
+import exitHook from 'exit-hook';
 
 const TG_Token = process.env.token;
 const GoogleSheetID = process.env.document;
