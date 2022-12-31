@@ -37,7 +37,7 @@ server.listen(process.env.PORT || 5000);
 /**/
 
 Main();
-
+exitHook(() => { util.AddCounter() });
 
 async function Main() {
 

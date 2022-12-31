@@ -5,6 +5,7 @@ process.env["NTBA_FIX_319"] = 1;
 
 import * as util from './utils.js';
 import path from 'path';
+import exitHook from 'exit-hook';
 
 const privateConfig = util.GetJsonObj(path.join(util.GetAppDirPath(), 'etc/hidden_config.json'));
 const TG_AwHappyBdToken = privateConfig[0].TG_Token;
@@ -26,6 +27,7 @@ const _Tests = {
 
 runtest(_Tests.FullAppTest);
 //runtest(_Tests.StartBotTest);
+exitHook(() => { util.AddCounter() });
 
 async function runtest(id) {
     switch (id) {
@@ -185,6 +187,7 @@ async function GspreadSheetTest() {
 }
 
 import { AnimeHandler } from './Classes/AnimeHandler.js';
+
 async function AnimeHandlerTest() {
     var ah = new AnimeHandler();
     let anime = await ah.RandomAnimeAsync();
