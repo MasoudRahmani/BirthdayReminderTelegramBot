@@ -1,0 +1,7 @@
+{
+    "paths": {
+        "statsfile": "./resource/stats.json",
+        "htmlindex": "./public_log/index.html",
+        "htmltemplate": "./public_log/index-clean.html"
+    }
+}

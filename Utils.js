@@ -5,32 +5,7 @@ import { readFile } from "fs/promises";
 import mime from 'mime-types';
 import path from "path";
 import { fileURLToPath } from "url";
-
-/**
- * 
- * @param {Date} - Gregorian Date, Default today
- * 
- * @returns {String} Shamsi (jalali) string
- */
-function MiladiToShamdi(date = new Date()) {
-    return date.toLocaleDateString('fa-IR-u-nu-latn');
-}
-/**
- * @param {date} Miladi date - Default today
- * @returns {Integer} Shamsi Month
- */
-function GetShamsiMonth(date = new Date()) {
-    let jdate = MiladiToShamdi(date)
-    return parseInt(jdate.split('/')[1]);
-}
-/**
- * @param {date} Miladi date - Default today
- * @returns {Integer} Shamsi Day
- */
-function GetShamsiDay(date = new Date()) {
-    let jdate = MiladiToShamdi(date)
-    return parseInt(jdate.split('/')[2]);
-}
+const paths = GetJsonObj("./resource/StaticRootLink.json").paths;
 
 function isEmpty(val) {
     return (val === undefined || val == null || val.length <= 0) ? true : false;
@@ -38,7 +13,7 @@ function isEmpty(val) {
 
 function LogToPublic(txt) {
     const options = {
-        files: './public_log/index.html',
+        files: paths.htmlindex,
         from: /<\/ol>/i, //i is to ignore case sensitivity
         to: `<li class="list-group-item Multicolor">${new Date().toLocaleString('fa-IR-u-nu-latn')}  --  ${txt}</li>
             </ol>`
@@ -46,29 +21,42 @@ function LogToPublic(txt) {
     replaceInFile(options).catch((err) => { console.log(`LogToPublic Error: ${err.message}`); });
 
 }
-function AddCounter() {
-    //------stats
-    const statsfile = `./resource/stats.json`;
-    const stats = GetJsonObj(statsfile);
-    stats.TotalReq += 1;
-    WriteJson(statsfile, stats);
+const templ = [{ date_ms: 1672480758878, count: 0 }];
+let buffer = Array.from(templ);
+function AddCounter(flush = false) {
+    const ms = new Date().getTime();//now
+    const first_ms = buffer[0].date_ms;//first item
+    const time_passed = ms - first_ms;// how much time passed
+
+    const total_cnt = buffer[buffer.length - 1].count + 1;
+    buffer.push({ date_ms: ms, count: total_cnt });
+
+    if (flush || time_passed > 60000)//1min
+    {
+        UpdateTotalStats(total_cnt);
+        buffer = Array.from(templ);
+    }
+}
+const UpdateTotalStats = (nmb) => {//inner function
+    const stats = GetJsonObj(paths.statsfile);
+    stats.TotalReq += nmb;
+    WriteJson(paths.statsfile, stats);
     //public data------
     const optios = {
-        files: "./public_log/index.html",
+        files: paths.htmlindex,
         from: /id="RequestCount">.*</i,
         to: `id="RequestCount">${stats.TotalReq}<`
     };
     replaceInFile(optios).catch((err) => { console.log(`AddCounter Public Html Error: ${err.message}`); });
 }
+
 function GetFileExtension(animeCover) {
     let file_split = animeCover.split('.');
     return (file_split.Length != 1) ? `.${file_split[file_split.length - 1]}` : '';
 }
 function ResetPublicLog_HTML() {
     try {
-        let htmlindex = `./public_log/index.html`;
-        let template = `./public_log/index-clean.html`;
-        copyFileSync(template, htmlindex);
+        copyFileSync(paths.htmltemplate, paths.htmlindex);
         return true;
     } catch (error) {
         console.log(`LogToPublic Error: ${error.message}`);
@@ -125,6 +113,32 @@ function GetMimeType(filename) {
 }
 function GetAppDirPath() {
     return path.dirname(fileURLToPath(new URL(import.meta.url)))
+}
+
+/**
+ * 
+ * @param {Date} - Gregorian Date, Default today
+ * 
+ * @returns {String} Shamsi (jalali) string
+ */
+function MiladiToShamdi(date = new Date()) {
+    return date.toLocaleDateString('fa-IR-u-nu-latn');
+}
+/**
+ * @param {date} Miladi date - Default today
+ * @returns {Integer} Shamsi Month
+ */
+function GetShamsiMonth(date = new Date()) {
+    let jdate = MiladiToShamdi(date)
+    return parseInt(jdate.split('/')[1]);
+}
+/**
+ * @param {date} Miladi date - Default today
+ * @returns {Integer} Shamsi Day
+ */
+function GetShamsiDay(date = new Date()) {
+    let jdate = MiladiToShamdi(date)
+    return parseInt(jdate.split('/')[2]);
 }
 
 export {
