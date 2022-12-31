@@ -62,7 +62,7 @@ export class AnimeHandler {
             let r = await apiResponse.text();
             console.log(`RandomAnime Error: api response is empty or is down. ${r}`);
             LogToPublic(`RandomAnime Error: api response is empty or is down. ${r}`);
-            return { r, status };
+            return { anime: r, status };
         }
         let jsonRS = await apiResponse.text();
 
