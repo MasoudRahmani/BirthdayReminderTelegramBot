@@ -57,10 +57,11 @@ export class HappyBot {
         this.#bot = new TelegramBot(this.#token, { polling: { autoStart: true, interval: 60 } });
 
         this.#bot.on('polling_error', (err) => {
-            util.LogToPublic(`HappyBot Pulling Error: ${util.ShortError(err, 200)}...`);
-            console.log(`HappyBot Pulling Error: ${util.ShortError(err, 200)}...`); // => 'EFATAL'
+            util.LogToPublic(`HappyBot Pulling Error: ${util.ShortError(err, 300)}...`);
+            console.log(`HappyBot Pulling Error: ${util.ShortError(err, 350)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
+            util.AddCounter();
             if (
                 req.from.is_bot ||
                 util.isEmpty(req.text) // it is not text - vide, photo or etc
@@ -91,7 +92,6 @@ export class HappyBot {
     }
     #PrivateConversation(req, admin) {
         let isadmin = util.isEmpty(admin) ? false : true;
-        util.AddCounter();
         if (isadmin) {
             let commandPos = Object.values(this.#commands).findIndex((x) => { return req.text.startsWith(x); });
 
