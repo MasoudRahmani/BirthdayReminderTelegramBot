@@ -91,7 +91,7 @@ export class HappyBot {
     }
     #PrivateConversation(req, admin) {
         let isadmin = util.isEmpty(admin) ? false : true;
-
+        util.AddCounter();
         if (isadmin) {
             let commandPos = Object.values(this.#commands).findIndex((x) => { return req.text.startsWith(x); });
 

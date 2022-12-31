@@ -46,6 +46,20 @@ function LogToPublic(txt) {
     replaceInFile(options).catch((err) => { console.log(`LogToPublic Error: ${err.message}`); });
 
 }
+function AddCounter() {
+    //------stats
+    const statsfile = `./resource/stats.json`;
+    const stats = GetJsonObj(statsfile);
+    stats.TotalReq += 1;
+    WriteJson(statsfile, stats);
+    //public data------
+    const optios = {
+        files: "./public_log/index.html",
+        from: /id="RequestCount">.*</i,
+        to: `id="RequestCount">${stats.TotalReq}<`
+    };
+    replaceInFile(optios).catch((err) => { console.log(`AddCounter Public Html Error: ${err.message}`); });
+}
 function GetFileExtension(animeCover) {
     let file_split = animeCover.split('.');
     return (file_split.Length != 1) ? `.${file_split[file_split.length - 1]}` : '';
@@ -112,10 +126,12 @@ function GetMimeType(filename) {
 function GetAppDirPath() {
     return path.dirname(fileURLToPath(new URL(import.meta.url)))
 }
+
 export {
     MiladiToShamdi, GetShamsiDay, GetAppDirPath,
     GetShamsiMonth, isEmpty, LogToPublic,
     GetFileExtension, ResetPublicLog_HTML,
     GetJsonObj, WriteJson, ShortError,
-    eq_ic, GetFileAsync, GetMimeType
+    eq_ic, GetFileAsync, GetMimeType,
+    AddCounter
 }

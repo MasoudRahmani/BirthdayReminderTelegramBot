@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="20">
   <link rel="shortcut icon" type="image/x-icon" href="./static/favicon.ico">
   <link type="text/css" rel="stylesheet" href="./static/bootstrap.min.css"  />
   <script type="text/javascript" src="./static/bootstrap.bundle.min.js"></script>
@@ -29,6 +30,7 @@
           <path d="m487.23 462.45h-231.23v49.548h231.23c13.682 0 24.774-11.091 24.774-24.774 0-13.68-11.092-24.774-24.774-24.774z" fill="#72C8B0"/>
           </svg>
         <span class="fs-4 fw-bold">AW HappyBD Log</span>
+        <span class="badge bg-dark bg-opacity-50 mx-sm-1" id="RequestCount">100</span>
       </a>
     </header>
     <div class="d-flex justify-content-evenly align-items-center mb-2">
@@ -49,11 +51,5 @@
     </div>
   </div>
 </body>
-<script>
-  setInterval(() => {
-    var d = new Date();
-  document.getElementById('CurrentTimeUTC').textContent = d.toUTCString();      
-  document.getElementById('CurrentTime').textContent = d.toLocaleString();      
-  }, 700);
-</script>
+  <script type="text/javascript" src="./static/awhappybd.js"></script>
 </html>
