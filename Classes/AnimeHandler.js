@@ -105,7 +105,7 @@ export class AnimeHandler {
         let desc = htmlToText(raw.description, { preserveNewlines: true });
         let mimetyp = GetMimeType(ext || 'image/jpeg');
 
-        desc.replaceAll("\n\n\n\n", "\n\n").replaceAll("\n\n\n", "\n\n");
+        desc = desc.replaceAll("\n\n\n\n", "\n\n").replaceAll("\n\n\n", "\n\n");
 
         let anime_data = new Anime();
         anime_data = {
