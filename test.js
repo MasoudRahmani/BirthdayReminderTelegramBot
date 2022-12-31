@@ -27,7 +27,7 @@ const _Tests = {
 
 runtest(_Tests.FullAppTest);
 //runtest(_Tests.StartBotTest);
-exitHook(() => { util.AddCounter() });
+exitHook(() => { util.AddCounter(true) });
 
 async function runtest(id) {
     switch (id) {
