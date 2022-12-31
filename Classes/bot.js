@@ -54,7 +54,7 @@ export class HappyBot {
     }
 
     async Init() {
-        this.#bot = new TelegramBot(this.#token, { polling: true });
+        this.#bot = new TelegramBot(this.#token, { polling: { autoStart: true, interval: 60 } });
 
         this.#bot.on('polling_error', (err) => {
             util.LogToPublic(`HappyBot Pulling Error: ${util.ShortError(err, 200)}...`);
