@@ -61,7 +61,6 @@ export class HappyBot {
             console.log(`HappyBot Pulling Error: ${util.ShortError(err, 350)}...`); // => 'EFATAL'
         });
         this.#bot.on('message', (req) => {
-            util.AddCounter();
             if (
                 req.from.is_bot ||
                 util.isEmpty(req.text) // it is not text - vide, photo or etc
@@ -108,6 +107,7 @@ export class HappyBot {
                 this.#HandleOwnerRq(req);
         }
         else {
+            util.AddCounter();
             this.#bot.sendMessage(req.from.id, `🌹 🥳 بات تبریک تولد 💃🌹`).catch(err => { util.LogToPublic(util.ShortError(err, 200)); });
             this.#RandomAnime(req.from.id);
         }
@@ -123,6 +123,7 @@ export class HappyBot {
             }
         }
         if (util.eq_ic(req.text, "@AWBirthdayBot anime")) {
+            util.AddCounter();
             this.#RandomAnime(req.chat.id);
         }
     }
