@@ -26,7 +26,7 @@ let publicPath = `./public_log/`;
 let htmlindex = `./public_log/index.html`;
 
 if (!existsSync(htmlindex)) { //create indext based on template.
-    ResetPublicLog_HTML();
+    await ResetPublicLog_HTML();
 }
 
 var serve = serveStatic(publicPath, { index: ['index.html', 'index.htm'] })

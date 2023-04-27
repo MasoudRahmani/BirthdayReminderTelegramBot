@@ -197,7 +197,7 @@ export class HappyBot {
                 break;
             }
             case this.#commands.resetPublicHtml: {
-                let result = util.ResetPublicLog_HTML();
+                let result = await util.ResetPublicLog_HTML();
                 this.#bot.sendMessage(req.from.id, (result) ? `موفق` : ` ناموفق.`);
                 break;
             }

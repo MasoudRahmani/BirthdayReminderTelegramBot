@@ -17,7 +17,7 @@ const GoogleKey = privateConfig[0].GoogleKey;
 const TG_UnitTestBot = privateConfig[1].TG_Token; //
 const TestGroup = privateConfig[1].TG_privateGroup;
 
-
+await util.ResetPublicLog_HTML();
 
 const _Tests = {
     FullAppTest: 1, //Do not run With other test. run it alone
@@ -25,7 +25,7 @@ const _Tests = {
     AnimeHandlerTest: 6, SheetHandlerTest: 7, StartBotTest: 8
 };
 
-runtest(_Tests.FullAppTest);
+//runtest(_Tests.FullAppTest);
 //runtest(_Tests.StartBotTest);
 exitHook(() => { util.AddCounter(true) });
 
@@ -145,11 +145,11 @@ import http from 'http';
 import serveStatic from 'serve-static';
 import finalhandler from 'finalhandler';
 import { existsSync } from 'fs';
-function ServerTest() {
+async function ServerTest() {
     let htmlindex = `./public_log/index.html`;
 
     if (!existsSync(htmlindex)) {
-        util.ResetPublicLog_HTML();
+        await util.ResetPublicLog_HTML();
     }
     var h = util.GetAppDirPath();
 

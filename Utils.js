@@ -1,10 +1,11 @@
 'use strict'
 import replaceInFile from "replace-in-file";
-import { copyFileSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { readFile } from "fs/promises";
 import mime from 'mime-types';
 import path from "path";
 import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 const paths = GetJsonObj("./resource/StaticRootLink.json").paths;
 
 function isEmpty(val) {
@@ -54,9 +55,11 @@ function GetFileExtension(animeCover) {
     let file_split = animeCover.split('.');
     return (file_split.Length != 1) ? `.${file_split[file_split.length - 1]}` : '';
 }
-function ResetPublicLog_HTML() {
+async function ResetPublicLog_HTML() {
     try {
-        copyFileSync(paths.htmltemplate, paths.htmlindex);
+        let onlinehtml = await fetch("https://raw.githubusercontent.com/MasoudRahmani/BirthdayReminderTelegramBot/master/public_log/index-clean.html");
+        let rshtml = await onlinehtml.text();
+        writeFileSync(paths.htmlindex, rshtml, { encoding: "utf8", flag: "w" });
         return true;
     } catch (error) {
         console.log(`LogToPublic Error: ${error.message}`);
@@ -72,10 +75,16 @@ function GetJsonObj(path) {
         return false;
     }
 }
-function WriteJson(path, Object) {
 
+/**
+ * overwite path with new data
+ * @param {string} path write path
+ * @param {data} Object data to stringify
+ * @returns true or false
+ */
+function WriteJson(path, Object) {
     try {
-        writeFileSync(path, JSON.stringify(Object), { encoding: "utf8", });
+        writeFileSync(path, JSON.stringify(Object), { encoding: "utf8" });
         return true;
     } catch (error) {
         LogToPublic(`Json Write Erro: ${ShortError(error, 200)}`);
