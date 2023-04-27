@@ -3,101 +3,41 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    padding: .15rem;
 }
 
 .LogList {
-    font-weight: 300;
+    font-size: larger;
+    font-weight: 200;
+    padding: 2rem 3.4rem;
 }
 
-body {
-    /* for Firefox, default 1*/
-    -moz-transform: scale(1.2);
-    transform: scale(1.2);
-    /* For Chrome, IE, default 100%*/
-    zoom: 120%;
-    -moz-transform-origin: top;
-    transform-origin: top;
-}
 
-@-webkit-keyframes come-in {
-    0% {
-        -webkit-transform: translatey(100px);
-        transform: translatey(100px);
-        opacity: 0;
-    }
-
-    30% {
-        -webkit-transform: translateX(-50px) scale(0.4);
-        transform: translateX(-50px) scale(0.4);
-    }
-
-    70% {
-        -webkit-transform: translateX(0px) scale(1.2);
-        transform: translateX(0px) scale(1.2);
-    }
-
-    100% {
-        -webkit-transform: translatey(0px) scale(1);
-        transform: translatey(0px) scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes come-in {
-    0% {
-        -webkit-transform: translatey(100px);
-        transform: translatey(100px);
-        opacity: 0;
-    }
-
-    30% {
-        -webkit-transform: translateX(-50px) scale(0.4);
-        transform: translateX(-50px) scale(0.4);
-    }
-
-    70% {
-        -webkit-transform: translateX(0px) scale(1.2);
-        transform: translateX(0px) scale(1.2);
-    }
-
-    100% {
-        -webkit-transform: translatey(0px) scale(1);
-        transform: translatey(0px) scale(1);
-        opacity: 1;
-    }
-}
-
-.floating-button:hover {
-    box-shadow: 0 10px 25px rgba(44, 179, 240, 0.6);
+.mfloating-button:hover {
+    box-shadow: 0 20px 35px rgba(44, 179, 240, 0.6);
     -webkit-transform: translatey(5px);
     transform: translatey(5px);
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
 
-div.sticky {
-    position: -webkit-sticky;
-    /* Safari */
-    position: sticky;
-    top: 0;
-    margin: auto;
-}
 
-.floating-button {
+.mfloating-button {
     position: fixed;
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     background: #2cb3f0;
-    /* bottom: 30pt; */
+    
     border-radius: 50%;
-    right: 10%;
+    right: 5rem;
+    bottom: 7rem; 
     color: white;
-    line-height: 50px;
+    line-height: 52px;
     text-align: center;
-    font-size: 23px;
+    font-size: 33px;
     z-index: 1000;
     box-shadow: 0 10px 25px -5px rgba(44, 179, 240, 0.6);
-    cursor: pointer;
+    cursor: grabbing;
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
