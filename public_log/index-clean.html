@@ -13,48 +13,53 @@
   <!-- https://raw.githubusercontent.com/MasoudRahmani/BirthdayReminderTelegramBot/master/public_log/ -->
 </head>
 
-<body>
-  <div class="container-fluid w-75 p-lg-5" style="margin-top: 20px;">
-    <header class="mb-2 border-bottom">
-      <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-        <?xml version="1.0" encoding="UTF-8"?>
-        <svg enable-background="new 0 0 512 512" width="50" height="52" class="me-2" version="1.1"  viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-          <path d="m256 148.65c-13.682 0-24.774 11.091-24.774 24.774v82.574c0 13.684 11.092 24.774 24.774 24.774s24.774-11.091 24.774-24.774v-82.574c0-13.683-11.092-24.774-24.774-24.774z" fill="#3C695E"/>
-          <path d="m302.2 51.633c-12.731-21.947-25.291-40.171-25.82-40.935-4.626-6.698-12.245-10.695-20.384-10.695s-15.758 3.997-20.384 10.694c-0.529 0.765-13.089 18.989-25.82 40.935-25.204 43.447-28.119 62.038-28.119 72.242 0 40.981 33.341 74.323 74.323 74.323 40.98 0 74.323-33.343 74.323-74.323 0-10.203-2.916-28.794-28.119-72.241z" fill="#E49429"/>
-          <path d="m421.16 231.22h-330.32c-13.682 0-24.774 11.094-24.774 24.774v231.23c0 13.684 11.092 24.774 24.774 24.774h330.32c13.682 0 24.774-11.091 24.774-24.774v-231.23c-1e-3 -13.681-11.093-24.774-24.775-24.774z" fill="#F2D6A8"/>
-          <path d="m421.16 231.22h-165.16v280.77h165.16c13.682 0 24.774-11.091 24.774-24.774v-231.23c0-13.681-11.092-24.774-24.774-24.774z" fill="#EDC07B"/>
-          <path d="m421.16 231.22h-330.32c-6.572 0-12.873 2.611-17.519 7.259-4.646 4.644-7.256 10.945-7.256 17.517l3e-3 102.46c0 11.512 7.929 21.504 19.141 24.123 4.998 1.168 9.522 2.674 14.308 4.271 13.4 4.466 28.588 9.53 57.387 9.53 28.796 0 43.986-5.064 57.387-9.53 11.707-3.903 20.954-6.986 41.721-6.986 20.751 0 29.998 3.084 41.707 6.986 13.398 4.468 28.586 9.53 57.377 9.53s43.978-5.061 57.377-9.527c4.791-1.599 9.317-3.107 14.318-4.274 11.213-2.616 19.146-12.613 19.146-24.125v-102.46c-1e-3 -13.681-11.093-24.774-24.775-24.774z" fill="#C01E77"/>
-          <path d="m487.23 512h-462.45c-13.682 0-24.774-11.091-24.774-24.775 0-13.68 11.092-24.774 24.774-24.774h462.45c13.682 0 24.774 11.094 24.774 24.774 0 13.684-11.092 24.775-24.774 24.775z" fill="#7BD9BF"/>
-          <path d="m330.32 123.87c0-10.204-2.915-28.794-28.119-72.242-12.731-21.947-25.291-40.171-25.82-40.935-4.626-6.697-12.245-10.694-20.384-10.694v198.19c40.98 0 74.323-33.343 74.323-74.323z" fill="#B77220"/>
-          <path d="m421.16 231.22h-165.16v148.65h0.012c20.751 0 29.998 3.084 41.707 6.986 13.398 4.468 28.586 9.53 57.377 9.53s43.978-5.061 57.377-9.527c4.791-1.599 9.317-3.107 14.318-4.274 11.213-2.616 19.146-12.613 19.146-24.125v-102.46c-2e-3 -13.681-11.094-24.774-24.776-24.774z" fill="#A61B67"/>
-          <path d="m487.23 462.45h-231.23v49.548h231.23c13.682 0 24.774-11.091 24.774-24.774 0-13.68-11.092-24.774-24.774-24.774z" fill="#72C8B0"/>
-          </svg>
-        <span class="fs-4 fw-bold">AW HappyBD Log</span>
-        <span class="badge bg-dark bg-opacity-50 mx-sm-1" id="RequestCount">100</span>
-      </a>
-    </header>
-    <div class="sticky">
-      <div class="form-floating">
-        <div class="floating-button" >🐼</div>
-      </div>  
-      </div>
-    <div class="d-flex justify-content-evenly align-items-center mb-2">
-      <button type="button" class="btn btn-outline-success">
-        Local Time: <span class="badge bg-success" id="CurrentTime">
-          <span id="CurrentTimeUTC">12/21/2022, 1:03:28 AM</span>
-      </button>
-        <button type="button" class="btn btn-outline-primary">
-          UTC Time: <span class="badge bg-primary" id="CurrentTimeUTC">
-            <span id="CurrentTimeUTC">Tue, 20 Dec 2022 21:29:31 GMT</span>
-        </button>
-      </div>  
-    <div class="p-5 mb-4 bg-light rounded-3">
-      <div class="container-fluid">
-        <ol class="list-group-flush  list-group-numbered LogList" style="color:Purple">
+<body class="container-fluid" style="background-color: rgb(239, 241, 242); min-height: 1000px; width: 85%;">
+<nav class="navbar navbar-expand-sm border-top justify-content-lg-between fixed-bottom mx-sm-3" style="background-color: rgb(239, 241, 242);" >
+  <header class="navbar-brand align-items-md-start d-sm-flex align-items-md-center"">
+    <a href="https://t.me/AWBirthdayBot">
+      <?xml version="1.0" encoding="UTF-8"?>
+      <svg enable-background="new 0 0 512 512" width="50" height="52" class="me-2" version="1.1"  viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+        <path d="m256 148.65c-13.682 0-24.774 11.091-24.774 24.774v82.574c0 13.684 11.092 24.774 24.774 24.774s24.774-11.091 24.774-24.774v-82.574c0-13.683-11.092-24.774-24.774-24.774z" fill="#3C695E"/>
+        <path d="m302.2 51.633c-12.731-21.947-25.291-40.171-25.82-40.935-4.626-6.698-12.245-10.695-20.384-10.695s-15.758 3.997-20.384 10.694c-0.529 0.765-13.089 18.989-25.82 40.935-25.204 43.447-28.119 62.038-28.119 72.242 0 40.981 33.341 74.323 74.323 74.323 40.98 0 74.323-33.343 74.323-74.323 0-10.203-2.916-28.794-28.119-72.241z" fill="#E49429"/>
+        <path d="m421.16 231.22h-330.32c-13.682 0-24.774 11.094-24.774 24.774v231.23c0 13.684 11.092 24.774 24.774 24.774h330.32c13.682 0 24.774-11.091 24.774-24.774v-231.23c-1e-3 -13.681-11.093-24.774-24.775-24.774z" fill="#F2D6A8"/>
+        <path d="m421.16 231.22h-165.16v280.77h165.16c13.682 0 24.774-11.091 24.774-24.774v-231.23c0-13.681-11.092-24.774-24.774-24.774z" fill="#EDC07B"/>
+        <path d="m421.16 231.22h-330.32c-6.572 0-12.873 2.611-17.519 7.259-4.646 4.644-7.256 10.945-7.256 17.517l3e-3 102.46c0 11.512 7.929 21.504 19.141 24.123 4.998 1.168 9.522 2.674 14.308 4.271 13.4 4.466 28.588 9.53 57.387 9.53 28.796 0 43.986-5.064 57.387-9.53 11.707-3.903 20.954-6.986 41.721-6.986 20.751 0 29.998 3.084 41.707 6.986 13.398 4.468 28.586 9.53 57.377 9.53s43.978-5.061 57.377-9.527c4.791-1.599 9.317-3.107 14.318-4.274 11.213-2.616 19.146-12.613 19.146-24.125v-102.46c-1e-3 -13.681-11.093-24.774-24.775-24.774z" fill="#C01E77"/>
+        <path d="m487.23 512h-462.45c-13.682 0-24.774-11.091-24.774-24.775 0-13.68 11.092-24.774 24.774-24.774h462.45c13.682 0 24.774 11.094 24.774 24.774 0 13.684-11.092 24.775-24.774 24.775z" fill="#7BD9BF"/>
+        <path d="m330.32 123.87c0-10.204-2.915-28.794-28.119-72.242-12.731-21.947-25.291-40.171-25.82-40.935-4.626-6.697-12.245-10.694-20.384-10.694v198.19c40.98 0 74.323-33.343 74.323-74.323z" fill="#B77220"/>
+        <path d="m421.16 231.22h-165.16v148.65h0.012c20.751 0 29.998 3.084 41.707 6.986 13.398 4.468 28.586 9.53 57.377 9.53s43.978-5.061 57.377-9.527c4.791-1.599 9.317-3.107 14.318-4.274 11.213-2.616 19.146-12.613 19.146-24.125v-102.46c-2e-3 -13.681-11.094-24.774-24.776-24.774z" fill="#A61B67"/>
+        <path d="m487.23 462.45h-231.23v49.548h231.23c13.682 0 24.774-11.091 24.774-24.774 0-13.68-11.092-24.774-24.774-24.774z" fill="#72C8B0"/>
+        </svg>
+    </a>
+    <span class="fs-4 fw-semibold">AW HappyBD Log</span>
+    <h6><span class="badge bg-dark bg-opacity-75 mx-sm-1" id="RequestCount">100</span></h6>
+  </header>
+  <div id="TimeContainer">
+    <button id="LocalTime" type="button" class="btn btn-outline-success">
+      Local Time: <span class="badge bg-success" id="CurrentTime">
+        <span id="CurrentTimeUTC"></span>
+    </button>
+    <button id="UTCTime" type="button" class="btn btn-outline-primary">
+      UTC Time: <span class="badge bg-primary" id="CurrentTimeUTC">
+        <span id="CurrentTimeUTC"></span>
+    </button>
+  </div> 
+</nav>
+
+<div id="LogText" class="container-fluid row m-md-3">
+  <div class="bg-light rounded-3 col col-xxl-12">
+    <div class="container-fluid">
+      <ol class="list-group-flush  list-group-numbered LogList" style="color:Purple">
+        <span class="border-bottom border-2 opacity-25 fs-4 fw-lighter" style="font-family:Verdana, Geneva, Tahoma, sans-serif; color: black;">Welcome</span>
+        
         </ol>
-      </div>
     </div>
   </div>
+  <div class="col col-auto"">
+    <div class="mform-floating">
+      <div class="mfloating-button" onclick="topFunction()" >🐼</div></div>  
+    </div>
+</div>
+
 </body>
   <script type="text/javascript" src="./static/awhappybd.js"></script>
 </html>
