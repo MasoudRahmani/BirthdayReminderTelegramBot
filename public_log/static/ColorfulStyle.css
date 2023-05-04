@@ -3,16 +3,13 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    padding: .15rem;
+    padding: .1rem;
 }
-
 .LogList {
-    font-size: larger;
-    font-weight: 200;
-    padding: 2rem 3.4rem;
+    font-size: large;
+    font-weight: 50;
+    padding: .25rem;
 }
-
-
 .mfloating-button:hover {
     box-shadow: 0 20px 35px rgba(44, 179, 240, 0.6);
     -webkit-transform: translatey(5px);
@@ -20,17 +17,14 @@
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
-
-
 .mfloating-button {
     position: fixed;
+    right: 3rem;
+    bottom: 7rem; 
     width: 60px;
     height: 60px;
     background: #2cb3f0;
-    
     border-radius: 50%;
-    right: 5rem;
-    bottom: 7rem; 
     color: white;
     line-height: 52px;
     text-align: center;
